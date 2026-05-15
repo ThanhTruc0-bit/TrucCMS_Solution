@@ -1,0 +1,39 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@   
+@model CMS.Data.Entities.Post
+
+ 
+
+    <div class="container mt-5">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/Post">Danh sách bài viết</a></li>
+                <li class="breadcrumb-item active">Chi tiết bài viết</li>
+            </ol>
+        </nav>
+
+        <div class="row justify-content-center">
+            <div class="col-md-10">
+                <h1 class="display-4 fw-bold text-primary">@Model.Title</h1>
+                <p class="text-muted">Đăng ngày: @Model.CreatedDate.ToString("dd/MM/yyyy HH:mm")</p>
+                <hr />
+
+                <div class="text-center mb-4">
+                    <img src="@Model.ImageUrl" class="img-fluid rounded shadow" alt="Post Image" style="width: 100%;">
+                </div>
+
+                <div class="post-content fs-5 leading-lg">
+                    @Model.Content
+                </div>
+
+                <div class="mt-5 border-top pt-3">
+                    <a href="/Post" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left"></i> Quay lại danh sách
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
