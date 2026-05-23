@@ -3,12 +3,13 @@ Họ Tên: Nguyễn Thị Thanh Trúc
 MSSV: 2123110119
 Lớp: CCQ2311D
 Ngày tạo: 15/05/2026
-Mô tả: Thực thể danh mục 
- */
+Mô tả: Thực thể danh mục
+*/
 
-using Microsoft.AspNetCore.Mvc;
 using CMS.Data;
 using CMS.Data.Entities;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace CMS.Backend.Controllers
 {
@@ -23,28 +24,42 @@ namespace CMS.Backend.Controllers
             _context = context;
         }
 
-        // Hàm Index: Hiển thị danh sách bài viết từ Database
-        public IActionResult Index()
+        // Hàm Index: Hiển thị danh sách bài viết
+        public IActionResult Index(int? id)
         {
-            // Lấy danh sách bài viết từ Database
-            var posts = _context.Posts.ToList();
+            // Lấy danh sách bài viết và kèm thông tin Category
+            var posts = _context.Posts
+                                .Include(p => p.Category)
+                                .OrderByDescending(p => p.CreatedDate);
 
-            // Gửi danh sách dữ liệu sang View
-            return View(posts);
+            // Nếu có id thì lọc theo danh mục
+            if (id != null)
+            {
+                posts = posts.Where(p => p.CategoryId == id)
+                             .OrderByDescending(p => p.CreatedDate);
+            }
+
+            // Trả dữ liệu về View
+            return View(posts.ToList());
         }
 
         // Hàm Details: Hiển thị chi tiết bài viết
+        // GET: Post/Details/5
         public IActionResult Details(int id)
         {
-            // Tìm bài viết theo Id trong Database
-            var post = _context.Posts.FirstOrDefault(p => p.Id == id);
+            // 1. Truy vấn bài viết theo ID
+            // Sử dụng .Include(p => p.Category) để lấy kèm thông tin Danh mục (Join bảng)
+            var post = _context.Posts
+                .Include(p => p.Category)
+                .FirstOrDefault(p => p.Id == id);
 
-            // Nếu không tìm thấy
+            // 2. Kiểm tra nếu không tìm thấy bài viết (tránh lỗi màn hình trắng)
             if (post == null)
             {
-                return NotFound();
+                return NotFound(); // Trả về trang lỗi 404
             }
 
+            // 3. Truyền dữ liệu sang View
             return View(post);
         }
     }
