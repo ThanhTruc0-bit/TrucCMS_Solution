@@ -9,11 +9,14 @@ Mô tả: Thực thể danh mục
 using CMS.Data;
 using CMS.Data.Entities;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace CMS.Backend.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class CategoryController : Controller
     {
+
         // Khai báo biến context
         private readonly ApplicationDbContext _context;
 
