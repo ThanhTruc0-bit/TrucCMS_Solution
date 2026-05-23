@@ -1,6 +1,6 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@{
+    Layout = "_LayoutAdmin";
+}
 
 @model IEnumerable<CMS.Data.Entities.Post>
 
@@ -24,29 +24,54 @@
 
                     <div class="card-body">
 
+                        <!-- Tên danh mục -->
                         <span class="badge bg-info text-dark">
                             @item.Category.Name
                         </span>
 
+                        <!-- Tiêu đề -->
                         <h5 class="card-title text-primary mt-2">
                             @item.Title
                         </h5>
 
+                        <!-- Nội dung -->
                         <p class="card-text text-truncate">
                             @item.Content
                         </p>
 
+                        <!-- Ngày đăng -->
                         <p class="text-muted small">
                             Ngày đăng:
                             @item.CreatedDate.ToString("dd/MM/yyyy")
                         </p>
 
+                        <!-- Nút xem chi tiết -->
                         <a href="/Post/Details/@item.Id"
                            class="btn btn-outline-primary btn-sm">
                             Xem chi tiết
                         </a>
 
+                        <!-- Nút xóa -->
+                        <a asp-action="Delete"
+                           asp-route-id="@item.Id"
+                           class="btn btn-sm btn-outline-danger"
+                           onclick="return confirm('Chúng ta có chắc chắn muốn xóa bài viết này không?')">
+
+                            <i class="bi bi-trash"></i>
+                            Xóa
+
+                        </a>
+                        <a asp-action="Edit"
+                           asp-route-id="@item.Id"
+                           class="btn btn-sm btn-outline-warning">
+
+                            <i class="bi bi-pencil-square"></i>
+                            Sửa
+
+                        </a>
+
                     </div>
+
                 </div>
 
             </div>

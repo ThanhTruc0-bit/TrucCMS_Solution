@@ -1,0 +1,46 @@
+﻿@model CMS.Data.Entities.User
+@{
+    Layout = "_LayoutAdmin";
+}
+
+<div class="container mt-4">
+    <div class="card shadow">
+        <div class="card-header bg-warning text-dark">
+            <h5 class="mb-0">CẬP NHẬT THÔNG TIN THÀNH VIÊN</h5>
+        </div>
+        <div class="card-body">
+            <form asp-action="Edit" method="post">
+                <input type="hidden" asp-for="Id" />
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label class="fw-bold">Tên đăng nhập:</label>
+                        <input asp-for="Username" class="form-control" readonly />
+                        <small class="text-muted">Tên đăng nhập không được phép sửa.</small>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="fw-bold">Mật khẩu mới:</label>
+                        <input type="password" name="NewPassword" class="form-control" placeholder="Để trống nếu không muốn đổi" />
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label class="fw-bold">Họ và Tên:</label>
+                        <input asp-for="FullName" class="form-control" required />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="fw-bold">Vai trò:</label>
+                        <select asp-for="Role" class="form-select">
+                            <option value="Admin">Admin</option>
+                            <option value="Editor">Editor</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Cập nhật</button>
+                <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+            </form>
+        </div>
+    </div>
+</div>

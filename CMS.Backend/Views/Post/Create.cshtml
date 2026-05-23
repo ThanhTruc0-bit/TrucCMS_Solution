@@ -1,0 +1,144 @@
+﻿@model CMS.Data.Entities.Post
+
+@{
+    Layout = "_LayoutAdmin";
+    ViewData["Title"] = "Thêm bài viết mới";
+}
+
+<div class="container mt-4">
+    <div class="card shadow">
+
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">
+                <i class="bi bi-file-earmark-plus"></i>
+                THÊM BÀI VIẾT MỚI
+            </h4>
+        </div>
+
+        <div class="card-body">
+
+            <form asp-action="Create"
+                  method="post"
+                  enctype="multipart/form-data">
+
+                <div class="row">
+
+                    <div class="col-md-8">
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">
+                                Tiêu đề bài viết:
+                            </label>
+
+                            <input asp-for="Title"
+                                   class="form-control"
+                                   placeholder="Nhập tiêu đề..." />
+                        </div>
+
+                        <div class="mb-3">
+
+                            <label class="form-label fw-bold">
+                                Nội dung chi tiết:
+                            </label>
+
+                            <textarea asp-for="Content"
+                                      class="form-control"
+                                      rows="10"
+                                      placeholder="Viết nội dung tại đây..."></textarea>
+
+                        </div>
+
+                    </div>
+
+                    <div class="col-md-4">
+
+                        <div class="mb-3">
+
+                            <label class="form-label fw-bold">
+                                Chuyên mục:
+                            </label>
+
+                            <select asp-for="CategoryId"
+                                    class="form-select"
+                                    asp-items="ViewBag.CategoryList">
+
+                                <option value="">
+                                    -- Chọn danh mục --
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                        <div class="mb-3">
+
+                            <label class="form-label fw-bold">
+                                Chọn ảnh đại diện:
+                            </label>
+
+                            <input type="file"
+                                   name="uploadImage"
+                                   class="form-control" />
+
+                        </div>
+                        <div class="mb-3">
+
+                            <label class="form-label fw-bold">
+                                Ngày đăng:
+                            </label>
+
+                            <input asp-for="CreatedDate"
+                                   type="date"
+                                   class="form-control"
+                                   value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+
+                        </div>
+
+                        <hr />
+
+                        <div class="d-grid gap-2">
+
+                            <button type="submit"
+                                    class="btn btn-success">
+
+                                <i class="bi bi-cloud-arrow-up"></i>
+                                Lưu và Đăng bài
+
+                            </button>
+
+                            <a asp-action="Index"
+                               class="btn btn-secondary">
+
+                                <i class="bi bi-arrow-left"></i>
+                                Quay lại danh sách
+
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+</div>
+
+@section Scripts {
+
+    <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
+
+    <script>
+
+        // Kích hoạt CKEditor cho textarea Content
+        ClassicEditor
+            .create(document.querySelector('#Content'))
+            .catch(error => {
+                console.error(error);
+            });
+
+    </script>
+}

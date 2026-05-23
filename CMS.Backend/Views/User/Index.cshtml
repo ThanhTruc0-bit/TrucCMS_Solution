@@ -1,26 +1,24 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@{
+    Layout = "_LayoutAdmin";
+}
 
 @model IEnumerable<CMS.Data.Entities.User>
 
 <div class="container mt-4">
 
     <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="text-dark">QUẢN LÝ THÀNH VIÊN</h2>
 
-        <h2 class="text-dark">
-            QUẢN LÝ THÀNH VIÊN
-        </h2>
-
-        <button class="btn btn-success btn-sm">
-            + Thêm thành viên mới
-        </button>
-
+        <a asp-action="Create" class="btn btn-success">
+            <i class="bi bi-plus-circle"></i>
+            Thêm thành viên mới
+        </a>
     </div>
 
     <table class="table table-hover shadow-sm border">
 
         <thead class="table-light">
+
             <tr>
                 <th>ID</th>
                 <th>Tên Đăng Nhập</th>
@@ -28,6 +26,7 @@
                 <th>Quyền Hạn</th>
                 <th>Thao Tác</th>
             </tr>
+
         </thead>
 
         <tbody>
@@ -46,9 +45,15 @@
 
                     <td>
 
-                        @if (user.Role == "Administrator")
+                        @if (user.Role == "Admin")
                         {
                             <span class="badge bg-danger">
+                                @user.Role
+                            </span>
+                        }
+                        else if (user.Role == "Moderator")
+                        {
+                            <span class="badge bg-warning text-dark">
                                 @user.Role
                             </span>
                         }
@@ -62,13 +67,24 @@
                     </td>
 
                     <td>
-                        <button class="btn btn-sm btn-outline-warning">
-                            Sửa
-                        </button>
 
-                        <button class="btn btn-sm btn-outline-danger">
+                        <a asp-action="Edit"
+                           asp-route-id="@user.Id"
+                           class="btn btn-sm btn-outline-warning">
+
+                            Sửa
+
+                        </a>
+
+                        <a asp-action="Delete"
+                           asp-route-id="@user.Id"
+                           class="btn btn-sm btn-outline-danger"
+                           onclick="return confirm('Bạn có chắc chắn muốn xóa thành viên @user.Username không?')">
+
                             Xóa
-                        </button>
+
+                        </a>
+
                     </td>
 
                 </tr>

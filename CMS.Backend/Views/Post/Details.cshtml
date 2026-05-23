@@ -1,10 +1,7 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@   
+﻿@{
+    Layout = "_LayoutAdmin";
+}
 @model CMS.Data.Entities.Post
-
- 
-
     <div class="container mt-5">
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
@@ -26,9 +23,9 @@
                     <img src="@Model.ImageUrl" class="img-fluid rounded shadow" alt="Post Image" style="width: 100%;">
                 </div>
 
-                <div class="post-content fs-5 leading-lg">
-                    @Model.Content
-                </div>
+            <div class="post-content">
+                @Html.Raw(Model.Content)
+            </div>
 
                 <div class="mt-5 border-top pt-3">
                     <a href="/Post" class="btn btn-secondary">

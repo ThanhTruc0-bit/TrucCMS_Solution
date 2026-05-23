@@ -51,35 +51,56 @@ namespace CMS.Backend.Controllers
             // BƯỚC 3: Quay về trang danh sách
             return RedirectToAction("Index");
         }
+
         // Action nhận vào Id của danh mục cần xóa
         public IActionResult Delete(int id)
         {
             // Bước 1: Tìm đối tượng danh mục trong Database bằng Id
             var category = _context.Categories.Find(id);
 
-            // Kiểm tra nếu tìm thấy thì mới xóa
-            if (category != null)
+            // Kiểm tra nếu không tồn tại
+            if (category == null)
             {
-                // Bước 2: Lệnh xóa khỏi bộ nhớ tạm (Tracking)
-                _context.Categories.Remove(category);
-
-                // Bước 3: Chốt phiên làm việc, xóa thực sự trong SQL Server
-                _context.SaveChanges();
+                return NotFound();
             }
 
-            // Sau khi xóa xong, quay lại trang danh sách để cập nhật giao diện
+            // Kiểm tra danh mục có bài viết không
+            bool hasPosts = _context.Posts
+                                    .Any(p => p.CategoryId == id);
+
+            // Nếu có bài viết thì không cho xóa
+            if (hasPosts)
+            {
+                TempData["Error"] =
+                    "Không thể xóa danh mục này vì đang chứa bài viết.";
+
+                return RedirectToAction("Index");
+            }
+
+            // Bước 2: Lệnh xóa khỏi bộ nhớ tạm
+            _context.Categories.Remove(category);
+
+            // Bước 3: Xóa thật trong SQL Server
+            _context.SaveChanges();
+
+            TempData["Success"] =
+                "Xóa danh mục thành công.";
+
+            // Quay lại trang danh sách
             return RedirectToAction("Index");
         }
+
         // 1. Hàm GET: Tìm dữ liệu cũ và đổ lên Form
         [HttpGet]
         public IActionResult Edit(int id)
         {
-            // Tìm danh mục trong Database theo Id [cite: 348, 350]
+            // Tìm danh mục trong Database theo Id
             var category = _context.Categories.Find(id);
 
-            if (category == null) return NotFound();
+            if (category == null)
+                return NotFound();
 
-            return View(category); // Gửi đối tượng tìm được sang giao diện Edit
+            return View(category);
         }
 
         // 2. Hàm POST: Nhận dữ liệu mới từ người dùng và lưu lại
@@ -89,13 +110,11 @@ namespace CMS.Backend.Controllers
             // Lệnh cập nhật đối tượng vào bộ nhớ tạm
             _context.Categories.Update(model);
 
-            // Lưu thay đổi thực sự xuống SQL Server [cite: 504, 509]
+            // Lưu thay đổi xuống SQL Server
             _context.SaveChanges();
 
-            // Quay lại trang danh sách để xem kết quả
+            // Quay lại trang danh sách
             return RedirectToAction("Index");
         }
-
-
     }
 }

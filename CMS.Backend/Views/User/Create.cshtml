@@ -1,0 +1,48 @@
+﻿@model CMS.Data.Entities.User
+
+@{
+    Layout = "_LayoutAdmin";
+    ViewData["Title"] = "Thêm thành viên";
+}
+
+<div class="container mt-4">
+    <div class="card shadow">
+        <div class="card-header bg-dark text-white">
+            <h5 class="mb-0">THÊM THÀNH VIÊN HỆ THỐNG</h5>
+        </div>
+        <div class="card-body">
+            <form asp-action="Create" method="post">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold">Tên đăng nhập (Username):</label>
+                        <input asp-for="Username" class="form-control" placeholder="Ví dụ: admin_thai" required />
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold">Mật khẩu:</label>
+                        <input asp-for="PasswordHash" type="password" class="form-control" required />
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold">Họ và Tên:</label>
+                        <input asp-for="FullName" class="form-control" placeholder="Nguyễn Văn A" required />
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold">Vai trò (Role):</label>
+                        <select asp-for="Role" class="form-select" required>
+                            <option value="">-- Chọn quyền hạn --</option>
+                            <option value="Admin">Quản trị viên (Admin)</option>
+                            <option value="Editor">Biên tập viên (Editor)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="mt-3">
+                    <button type="submit" class="btn btn-primary">Lưu thành viên</button>
+                    <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
