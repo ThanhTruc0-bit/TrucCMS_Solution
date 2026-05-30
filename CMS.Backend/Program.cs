@@ -12,16 +12,43 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.AccessDeniedPath = "/Account/AccessDenied";
     });
 
-// 🔴 FIX THIẾU QUAN TRỌNG
+// Authorization
 builder.Services.AddAuthorization();
 
+// MVC
 builder.Services.AddControllersWithViews();
 
 // DbContext
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// =============================
+// SWAGGER
+// =============================
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+// 1. Khai báo chính sách CORS
+builder.Services.AddCors(options => {
+    options.AddPolicy("AllowAll", policy => {
+        // Cho phép mọi nguồn (Origin), mọi phương thức (GET, POST...), mọi tiêu đề (Header)
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
+});
+
 var app = builder.Build();
+
+// =============================
+// BẬT SWAGGER
+// =============================
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
@@ -32,6 +59,8 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+// 2. Kích hoạt chính sách CORS đã khai báo ở trên
+app.UseCors("AllowAll");
 
 app.UseAuthentication();
 app.UseAuthorization();
