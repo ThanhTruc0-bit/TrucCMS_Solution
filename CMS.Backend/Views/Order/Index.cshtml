@@ -1,37 +1,127 @@
-﻿@{
+﻿@model IEnumerable<CMS.Data.Entities.Order>
+
+@{
     Layout = "_LayoutAdmin";
 }
-@model IEnumerable<CMS.Data.Entities.Order>
 
 <div class="container mt-4">
 
-    <h2 class="text-danger mb-4">
-        DANH SÁCH ĐƠN HÀNG
-    </h2>
+    <!-- HEADER -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
 
-    <table class="table table-bordered table-hover">
+        <h2 class="fw-bold text-danger">
+            📦 DANH SÁCH ĐƠN HÀNG
+        </h2>
 
-        <thead class="table-dark">
-            <tr>
-                <th>ID</th>
-                <th>Ngày Đặt</th>
-                <th>Khách Hàng</th>
-            </tr>
-        </thead>
+    </div>
 
-        <tbody>
+    <!-- CARD -->
+    <div class="card shadow-sm border-0">
 
-            @foreach (var item in Model)
-            {
-                <tr>
-                    <td>@item.Id</td>
-                    <td>@item.OrderDate</td>
-                    <td>@item.CustomerId</td>
-                </tr>
-            }
+        <div class="card-body p-0">
 
-        </tbody>
+            <table class="table table-hover align-middle mb-0">
 
-    </table>
+                <thead class="table-dark">
+                    <tr>
+                        <th width="70">ID</th>
+                        <th>Ngày đặt</th>
+                        <th>Khách hàng</th>
+                        <th>Trạng thái</th>
+                        <th class="text-center" width="260">Thao tác</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var item in Model)
+                        {
+                            <tr>
+
+                                <td class="fw-bold">@item.Id</td>
+
+                                <td>
+                                    <i class="bi bi-calendar-event me-1 text-muted"></i>
+                                    @item.OrderDate.ToString("dd/MM/yyyy")
+                                </td>
+
+                                <td>
+                                    <span class="fw-semibold">
+                                        @item.Customer?.FullName
+                                    </span>
+                                </td>
+
+                                <td>
+
+                                    @switch (item.Status)
+                                    {
+                                        case 0:
+                                            <span class="badge bg-warning text-dark">
+                                                ⏳ Chờ duyệt
+                                            </span>
+                                            break;
+
+                                        case 1:
+                                            <span class="badge bg-info">
+                                                🚚 Đang giao
+                                            </span>
+                                            break;
+
+                                        case 2:
+                                            <span class="badge bg-success">
+                                                ✅ Hoàn thành
+                                            </span>
+                                            break;
+
+                                        default:
+                                            <span class="badge bg-secondary">
+                                                Không rõ
+                                            </span>
+                                            break;
+                                    }
+
+                                </td>
+
+                                <td class="text-center">
+
+                                    <a class="btn btn-sm btn-primary me-1"
+                                       href="@Url.Action("Details", "Order", new { id = item.Id })">
+                                        🔍 Chi tiết
+                                    </a>
+
+                                    <a class="btn btn-sm btn-warning me-1"
+                                       href="@Url.Action("Edit", "Order", new { id = item.Id })">
+                                        ✏ Sửa
+                                    </a>
+
+                                    <a class="btn btn-sm btn-danger"
+                                       onclick="return confirm('Bạn có chắc muốn xóa đơn hàng này?');"
+                                       href="@Url.Action("Delete", "Order", new { id = item.Id })">
+                                        🗑 Xóa
+                                    </a>
+
+                                </td>
+
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="5" class="text-center text-muted py-4">
+                                Không có đơn hàng nào
+                            </td>
+                        </tr>
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
 
 </div>

@@ -1,0 +1,120 @@
+﻿@model CMS.Data.Entities.Product
+
+@{
+    Layout = "_LayoutAdmin";
+    ViewData["Title"] = "Sửa sản phẩm";
+}
+
+<div class="container mt-4">
+
+    <div class="card shadow">
+
+        <div class="card-header bg-warning">
+            <h4>
+                CHỈNH SỬA SẢN PHẨM
+            </h4>
+        </div>
+
+        <div class="card-body">
+
+            <form asp-action="Edit"
+                  method="post"
+                  enctype="multipart/form-data">
+
+                <input asp-for="Id" type="hidden" />
+                <input asp-for="ImageUrl" type="hidden" />
+
+                <div class="mb-3">
+
+                    <label class="form-label">
+                        Tên sản phẩm
+                    </label>
+
+                    <input asp-for="Name"
+                           class="form-control" />
+
+                </div>
+
+                <div class="mb-3">
+
+                    <label class="form-label">
+                        Giá
+                    </label>
+
+                    <input asp-for="Price"
+                           class="form-control" />
+
+                </div>
+
+                <div class="mb-3">
+
+                    <label class="form-label">
+                        Số lượng tồn
+                    </label>
+
+                    <input asp-for="StockQuantity"
+                           class="form-control" />
+
+                </div>
+
+                <div class="mb-3">
+
+                    <label class="form-label">
+                        Mô tả
+                    </label>
+
+                    <textarea asp-for="Description"
+                              class="form-control"
+                              rows="5"></textarea>
+
+                </div>
+
+                <div class="mb-3">
+
+                    <label class="form-label">
+                        Danh mục
+                    </label>
+
+                    <select asp-for="CategoryProductId"
+                            asp-items="ViewBag.CategoryList"
+                            class="form-select">
+                    </select>
+
+                </div>
+
+                <div class="mb-3">
+
+                    @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                    {
+                        <img src="@Model.ImageUrl"
+                             width="150"
+                             class="img-thumbnail mb-2" />
+                    }
+
+                    <input type="file"
+                           name="uploadImage"
+                           class="form-control" />
+
+                </div>
+
+                <button type="submit"
+                        class="btn btn-warning">
+
+                    Cập nhật
+
+                </button>
+
+                <a asp-action="Index"
+                   class="btn btn-secondary">
+
+                    Quay lại
+
+                </a>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>

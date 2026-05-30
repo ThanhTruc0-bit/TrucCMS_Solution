@@ -1,0 +1,101 @@
+﻿@{
+    Layout = "_LayoutAdmin";
+}
+
+<div class="container-fluid mt-4">
+
+    <h2 class="mb-4 fw-bold">Dashboard</h2>
+
+    <!-- CARDS -->
+    <div class="row g-3">
+
+        <div class="col-md-3">
+            <div class="card text-white bg-primary shadow">
+                <div class="card-body">
+                    <h5>Sản phẩm</h5>
+                    <h2>@ViewBag.Products</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card text-white bg-success shadow">
+                <div class="card-body">
+                    <h5>Khách hàng</h5>
+                    <h2>@ViewBag.Customers</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card text-white bg-warning shadow">
+                <div class="card-body">
+                    <h5>Đơn hàng</h5>
+                    <h2>@ViewBag.Orders</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card text-white bg-danger shadow">
+                <div class="card-body">
+                    <h5>Doanh thu</h5>
+                    <h4>@ViewBag.Revenue.ToString("N0") đ</h4>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- CHART AREA -->
+    <div class="row mt-4">
+
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-body">
+                    <h5>Biểu đồ (demo)</h5>
+                    <canvas id="chart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+
+            <div class="card shadow mb-3">
+                <div class="card-body">
+                    <h6>Đơn hàng mới</h6>
+                    <p class="text-muted">Hệ thống đang hoạt động bình thường</p>
+                </div>
+            </div>
+
+            <div class="card shadow">
+                <div class="card-body">
+                    <h6>Thông báo</h6>
+                    <p class="text-muted">Không có cảnh báo mới</p>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- CHART JS -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    var ctx = document.getElementById('chart');
+
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['SP', 'KH', 'ĐH'],
+            datasets: [{
+                label: 'Thống kê',
+                data: [@ViewBag.Products, @ViewBag.Customers, @ViewBag.Orders],
+                backgroundColor: ['#0d6efd', '#198754', '#ffc107']
+            }]
+        }
+    });
+</script>

@@ -1,0 +1,46 @@
+﻿@model CMS.Data.Entities.Product
+
+@{
+    Layout = "_LayoutAdmin";
+}
+
+<div class="container mt-4">
+
+    <div class="card shadow">
+
+        <div class="card-header bg-primary text-white">
+
+            <h3>@Model.Name</h3>
+
+        </div>
+
+        <div class="card-body">
+
+            <img src="@Model.ImageUrl"
+                 class="img-fluid mb-3"
+                 style="max-height:400px" />
+
+            <h5>Danh mục</h5>
+            <p>@Model.CategoryProduct?.Name</p>
+
+            <h5>Giá</h5>
+            <p>@Model.Price.ToString("N0") VNĐ</p>
+
+            <h5>Số lượng tồn</h5>
+            <p>@Model.StockQuantity</p>
+
+            <h5>Mô tả</h5>
+            <p>@Model.Description</p>
+
+            <a asp-action="Index"
+               class="btn btn-secondary">
+
+                Quay lại
+
+            </a>
+
+        </div>
+
+    </div>
+
+</div>

@@ -21,7 +21,8 @@
         <div class="card-body">
 
             <form asp-action="Edit"
-                  method="post">
+                  method="post"
+                  enctype="multipart/form-data">
 
                 <!-- Id ẩn -->
                 <input asp-for="Id" type="hidden" />
@@ -82,14 +83,29 @@
                         <div class="mb-3">
 
                             <label class="form-label fw-bold">
-                                Link ảnh đại diện (URL):
+                                Ảnh hiện tại:
                             </label>
 
-                            <input asp-for="ImageUrl"
-                                   class="form-control"
-                                   placeholder="https://..." />
+                            <br />
+
+                            <img src="@Model.ImageUrl"
+                                 width="250"
+                                 class="img-thumbnail" />
 
                         </div>
+
+                        <div class="mb-3">
+
+                            <label class="form-label fw-bold">
+                                Chọn ảnh mới:
+                            </label>
+
+                            <input type="file"
+                                   name="uploadImage"
+                                   class="form-control" />
+
+                        </div>
+                        <input asp-for="ImageUrl" type="hidden" />
 
                         <div class="mb-3">
 

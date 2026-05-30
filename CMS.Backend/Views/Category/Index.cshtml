@@ -1,79 +1,111 @@
-﻿@{
+﻿@model IEnumerable<CMS.Data.Entities.Category>
+
+@{
     Layout = "_LayoutAdmin";
 }
 
-@model IEnumerable<CMS.Data.Entities.Category>
+<div class="container mt-4">
 
-<h2 class="text-primary">
-    DANH SÁCH DANH MỤC (DỮ LIỆU THẬT LẤY TỪ DATABASE)
-</h2>
+    <!-- HEADER -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
 
-@if (TempData["Error"] != null)
-{
-    <div class="alert alert-danger">
-        @TempData["Error"]
+        <h2 class="fw-bold text-primary">
+            📁 DANH SÁCH DANH MỤC
+        </h2>
+
+        <a asp-action="Create" class="btn btn-success shadow-sm">
+            <i class="bi bi-plus-circle"></i>
+            Thêm danh mục
+        </a>
+
     </div>
-}
 
-@if (TempData["Success"] != null)
-{
-    <div class="alert alert-success">
-        @TempData["Success"]
+    <!-- ALERT -->
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success shadow-sm">
+            @TempData["Success"]
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger shadow-sm">
+            @TempData["Error"]
+        </div>
+    }
+
+    <!-- TABLE CARD -->
+    <div class="card shadow-sm border-0">
+
+        <div class="card-body p-0">
+
+            <table class="table table-hover align-middle mb-0">
+
+                <thead class="table-dark">
+                    <tr>
+                        <th width="80">ID</th>
+                        <th>Tên danh mục</th>
+                        <th>Mô tả</th>
+                        <th class="text-center" width="180">Thao tác</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var item in Model)
+                        {
+                            <tr>
+
+                                <td class="fw-bold">@item.Id</td>
+
+                                <td>
+                                    <span class="fw-semibold text-dark">
+                                        @item.Name
+                                    </span>
+                                </td>
+
+                                <td class="text-muted">
+                                    @item.Description
+                                </td>
+
+                                <td class="text-center">
+
+                                    <a asp-action="Edit"
+                                       asp-route-id="@item.Id"
+                                       class="btn btn-sm btn-warning me-1">
+                                        ✏ Sửa
+                                    </a>
+
+                                    <a asp-action="Delete"
+                                       asp-route-id="@item.Id"
+                                       class="btn btn-sm btn-danger"
+                                       onclick="return confirm('Bạn có chắc muốn xóa danh mục này?')">
+                                        🗑 Xóa
+                                    </a>
+
+                                </td>
+
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="4" class="text-center text-muted py-4">
+                                Không có dữ liệu
+                            </td>
+                        </tr>
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+
     </div>
-}
 
-<table class="table table-bordered">
-
-    <a asp-action="Create" class="btn btn-success">
-        <i class="bi bi-plus-circle"></i>
-        Thêm danh mục mới
-    </a>
-
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Tên danh mục</th>
-            <th>Mô tả</th>
-            <th style="width:150px">Thao tác</th>
-        </tr>
-    </thead>
-
-    <tbody>
-
-        @foreach (var item in Model)
-        {
-            <tr>
-
-                <td>@item.Id</td>
-
-                <td>@item.Name</td>
-
-                <td>@item.Description</td>
-
-                <td>
-
-                    <a asp-action="Edit"
-                       asp-route-id="@item.Id"
-                       class="btn btn-sm btn-outline-warning">
-
-                        Sửa
-
-                    </a>
-
-                    <a asp-action="Delete"
-                       asp-route-id="@item.Id"
-                       class="btn btn-sm btn-outline-danger"
-                       onclick="return confirm('Bạn có chắc chắn muốn xóa danh mục này không?')">
-
-                        Xóa
-
-                    </a>
-
-                </td>
-
-            </tr>
-        }
-
-    </tbody>
-
-</table>
+</div>

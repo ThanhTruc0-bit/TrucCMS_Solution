@@ -1,48 +1,72 @@
 ﻿@model IEnumerable<CMS.Data.Entities.Post>
 
-<div class="container mt-5">
+<div class="container py-5">
 
-    <h2 class="text-center mb-4 text-danger">
-        TIN TỨC MỚI NHẤT
-    </h2>
+    <!-- TITLE -->
+    <div class="text-center mb-5">
 
-    <div class="row">
+        <h2 class="fw-bold text-dark">
+            ✨ Bộ Sưu Tập Tin Tức Trang Sức
+        </h2>
+
+        <p class="text-muted">
+            Cập nhật xu hướng trang sức mới nhất, thiết kế cao cấp và phong cách sang trọng
+        </p>
+
+    </div>
+
+    <!-- POSTS -->
+    <div class="row g-4">
 
         @foreach (var item in Model)
         {
             <div class="col-md-4">
 
-                <div class="card shadow-sm h-100">
+                <div class="card border-0 shadow-sm h-100 post-card">
 
-                    <img src="@item.ImageUrl"
-                         class="card-img-top"
-                         alt="Thumbnail">
+                    <!-- IMAGE -->
+                    <div class="overflow-hidden" style="height: 240px;">
+
+                        <img src="@item.ImageUrl"
+                             class="w-100 h-100"
+                             style="object-fit: cover; transition: 0.4s;"
+                             alt="Post image">
+
+                    </div>
 
                     <div class="card-body">
 
-                        <span class="badge bg-primary mb-2">
+                        <!-- CATEGORY -->
+                        <span class="badge bg-dark mb-2 px-3 py-2">
                             @item.Category.Name
                         </span>
 
-                        <h5 class="card-title">
+                        <!-- TITLE -->
+                        <h5 class="fw-bold text-dark">
                             @item.Title
                         </h5>
 
-                        <p class="card-text text-truncate">
+                        <!-- CONTENT -->
+                        <p class="text-muted small"
+                           style="display:-webkit-box;
+                                      -webkit-line-clamp:2;
+                                      -webkit-box-orient:vertical;
+                                      overflow:hidden;">
                             @item.Content
                         </p>
 
+                        <!-- BUTTON -->
                         <a href="/Post/Details/@item.Id"
-                           class="btn btn-outline-danger btn-sm">
-                            Đọc tiếp
+                           class="btn btn-outline-dark btn-sm px-3">
+                            Xem chi tiết
                         </a>
 
                     </div>
 
-                    <div class="card-footer text-muted small">
+                    <!-- FOOTER -->
+                    <div class="card-footer bg-white border-0 text-muted small">
 
-                        Ngày đăng:
-                        @item.CreatedDate.ToString("dd/MM/yyyy")
+                        📅 @item.CreatedDate.ToString("dd/MM/yyyy")
 
                     </div>
 
@@ -54,3 +78,21 @@
     </div>
 
 </div>
+
+<!-- STYLE -->
+<style>
+    .post-card {
+        transition: all 0.3s ease;
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+        .post-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+
+        .post-card img:hover {
+            transform: scale(1.05);
+        }
+</style>

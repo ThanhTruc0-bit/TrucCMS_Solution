@@ -1,0 +1,38 @@
+﻿@model CMS.Data.Entities.CategoryProduct
+
+@{
+    Layout = "_LayoutAdmin";
+}
+
+<div class="container mt-4">
+
+    <h2>Thêm danh mục sản phẩm</h2>
+
+    <form asp-action="Create" method="post">
+
+        <div class="mb-3">
+            <label>Tên danh mục</label>
+            <input asp-for="Name" class="form-control" />
+            <span asp-validation-for="Name"
+                  class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label>Mô tả</label>
+            <textarea asp-for="Description"
+                      class="form-control"></textarea>
+        </div>
+
+        <button type="submit"
+                class="btn btn-success">
+            Lưu
+        </button>
+
+        <a asp-action="Index"
+           class="btn btn-secondary">
+            Quay lại
+        </a>
+
+    </form>
+
+</div>

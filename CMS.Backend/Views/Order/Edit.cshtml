@@ -1,0 +1,75 @@
+﻿@model CMS.Data.Entities.Order
+
+@{
+    Layout = "_LayoutAdmin";
+}
+
+<div class="container mt-4">
+
+    <div class="card shadow-lg">
+
+        <div class="card-header bg-danger text-white">
+            <h4>Chỉnh Sửa Đơn Hàng</h4>
+        </div>
+
+        <div class="card-body">
+
+            <form method="post">
+
+                <!-- ID -->
+                <input type="hidden" asp-for="Id" />
+
+                <!-- Ngày đặt -->
+                <div class="mb-3">
+                    <label class="form-label">Ngày Đặt</label>
+                    <input asp-for="OrderDate" class="form-control" type="date" />
+                </div>
+
+                <!-- KHÁCH HÀNG (FIX: dropdown thay vì nhập tay) -->
+                <div class="mb-3">
+                    <label class="form-label">Khách Hàng</label>
+
+                    <select asp-for="CustomerId" class="form-control">
+                        @foreach (var c in ViewBag.Customers)
+                        {
+                            <option value="@c.Id" selected="@(c.Id == Model.CustomerId)">
+                                @c.FullName
+                            </option>
+                        }
+                    </select>
+                </div>
+
+                <!-- TRẠNG THÁI -->
+                <div class="mb-3">
+                    <label class="form-label">Trạng Thái</label>
+
+                    <select asp-for="Status" class="form-control">
+                        <option value="0" selected="@(Model.Status == 0)">Chờ duyệt</option>
+                        <option value="1" selected="@(Model.Status == 1)">Đang giao</option>
+                        <option value="2" selected="@(Model.Status == 2)">Hoàn thành</option>
+                    </select>
+                </div>
+
+                <!-- GHI CHÚ -->
+                <div class="mb-3">
+                    <label class="form-label">Ghi Chú</label>
+                    <textarea asp-for="Notes" class="form-control" rows="3"></textarea>
+                </div>
+
+                <!-- BUTTON -->
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-success">
+                        Lưu
+                    </button>
+
+                    <a href="@Url.Action("Index", "Order")" class="btn btn-secondary">
+                        Quay lại
+                    </a>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+
+</div>

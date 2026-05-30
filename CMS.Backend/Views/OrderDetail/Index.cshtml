@@ -1,41 +1,110 @@
-﻿@{
+﻿@model IEnumerable<CMS.Data.Entities.OrderDetail>
+
+@{
     Layout = "_LayoutAdmin";
 }
-@model IEnumerable<CMS.Data.Entities.OrderDetail>
 
 <div class="container mt-4">
 
-    <h2 class="text-warning mb-4">
-        DANH SÁCH CHI TIẾT ĐƠN HÀNG
-    </h2>
+    <!-- HEADER -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
 
-    <table class="table table-bordered table-hover">
+        <h2 class="fw-bold text-warning">
+            🧾 CHI TIẾT HÓA ĐƠN
+        </h2>
 
-        <thead class="table-dark">
-            <tr>
-                <th>ID</th>
-                <th>Order ID</th>
-                <th>Product ID</th>
-                <th>Số Lượng</th>
-                <th>Đơn Giá</th>
-            </tr>
-        </thead>
+    </div>
 
-        <tbody>
+    <!-- CARD -->
+    <div class="card shadow-sm border-0">
 
-            @foreach (var item in Model)
-            {
-                <tr>
-                    <td>@item.Id</td>
-                    <td>@item.OrderId</td>
-                    <td>@item.ProductId</td>
-                    <td>@item.Quantity</td>
-                    <td>@item.UnitPrice</td>
-                </tr>
-            }
+        <div class="card-body p-0">
 
-        </tbody>
+            <table class="table table-hover align-middle mb-0">
 
-    </table>
+                <thead class="table-dark">
+                    <tr>
+                        <th width="70">ID</th>
+                        <th>Mã đơn</th>
+                        <th>Sản phẩm</th>
+                        <th class="text-center">SL</th>
+                        <th>Đơn giá</th>
+                        <th>Thành tiền</th>
+                        <th class="text-center" width="160">Thao tác</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var item in Model)
+                        {
+                            var total = item.Quantity * item.UnitPrice;
+
+                            <tr>
+
+                                <td class="fw-bold">@item.Id</td>
+
+                                <td>
+                                    <span class="badge bg-secondary">
+                                        #@item.OrderId
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <span class="fw-semibold">
+                                        @item.Product?.Name
+                                    </span>
+                                </td>
+
+                                <td class="text-center">
+                                    @item.Quantity
+                                </td>
+
+                                <td>
+                                    @item.UnitPrice.ToString("N0") đ
+                                </td>
+
+                                <td>
+                                    <span class="fw-bold text-success">
+                                        @total.ToString("N0") đ
+                                    </span>
+                                </td>
+
+                                <td class="text-center">
+
+                                    <a class="btn btn-sm btn-warning me-1"
+                                       href="@Url.Action("Edit", "OrderDetail", new { id = item.Id })">
+                                        ✏
+                                    </a>
+
+                                    <a class="btn btn-sm btn-danger"
+                                       onclick="return confirm('Xóa chi tiết này?');"
+                                       href="@Url.Action("Delete", "OrderDetail", new { id = item.Id })">
+                                        🗑
+                                    </a>
+
+                                </td>
+
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center text-muted py-4">
+                                Không có dữ liệu chi tiết đơn hàng
+                            </td>
+                        </tr>
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
 
 </div>

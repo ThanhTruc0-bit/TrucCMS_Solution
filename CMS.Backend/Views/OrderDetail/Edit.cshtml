@@ -1,0 +1,46 @@
+﻿@model CMS.Data.Entities.OrderDetail
+
+@{
+    Layout = "_LayoutAdmin";
+}
+
+<div class="container mt-4">
+
+    <div class="card shadow-lg">
+
+        <div class="card-header bg-warning">
+            <h4>Sửa Chi Tiết Đơn Hàng</h4>
+        </div>
+
+        <div class="card-body">
+
+            <form method="post">
+
+                <input type="hidden" asp-for="Id" />
+
+                <div class="mb-3">
+                    <label>Số lượng</label>
+                    <input asp-for="Quantity" class="form-control" />
+                </div>
+
+                <div class="mb-3">
+                    <label>Đơn giá</label>
+                    <input asp-for="UnitPrice" class="form-control" />
+                </div>
+
+                <div class="d-flex gap-2">
+                    <button class="btn btn-success" type="submit">Lưu</button>
+
+                    <a href="@Url.Action("Index", "OrderDetail")"
+                       class="btn btn-secondary">
+                        Quay lại
+                    </a>
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>

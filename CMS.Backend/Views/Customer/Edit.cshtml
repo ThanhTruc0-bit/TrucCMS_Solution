@@ -1,0 +1,51 @@
+﻿@model CMS.Data.Entities.Customer
+
+@{
+    Layout = "_LayoutAdmin";
+}
+
+<div class="container mt-4">
+
+    <div class="card shadow-lg">
+
+        <div class="card-header bg-primary text-white">
+            <h4>Chỉnh Sửa Khách Hàng</h4>
+        </div>
+
+        <div class="card-body">
+
+            <form method="post">
+                @Html.AntiForgeryToken()
+
+                <input type="hidden" asp-for="Id" />
+
+                <div class="mb-3">
+                    <label>Họ Tên</label>
+                    <input asp-for="FullName" class="form-control" />
+                </div>
+
+                <div class="mb-3">
+                    <label>Email</label>
+                    <input asp-for="Email" class="form-control" />
+                </div>
+
+                <div class="mb-3">
+                    <label>Số Điện Thoại</label>
+                    <input asp-for="Phone" class="form-control" />
+                </div>
+
+                <button type="submit" class="btn btn-success">
+                    Lưu
+                </button>
+
+                <a href="@Url.Action("Index", "Customer")"
+                   class="btn btn-secondary">
+                    Quay lại
+                </a>
+
+            </form>
+
+        </div>
+    </div>
+
+</div>

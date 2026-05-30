@@ -1,0 +1,110 @@
+﻿@model CMS.Data.Entities.Order
+
+@{
+    Layout = "_LayoutAdmin";
+    var details = ViewBag.OrderDetails as List<CMS.Data.Entities.OrderDetail>;
+}
+
+<div class="container mt-4">
+
+    <div class="card shadow-lg">
+
+        <div class="card-header bg-dark text-white text-center">
+            <h3>HÓA ĐƠN ĐƠN HÀNG</h3>
+        </div>
+
+        <div class="card-body">
+
+            <!-- THÔNG TIN KHÁCH -->
+            <div class="row mb-3">
+
+                <div class="col-md-6">
+                    <p><b>Mã đơn:</b> @Model.Id</p>
+                    <p><b>Ngày đặt:</b> @Model.OrderDate.ToString("dd/MM/yyyy")</p>
+                </div>
+
+                <div class="col-md-6">
+                    <p><b>Khách hàng:</b> @Model.Customer.FullName</p>
+                    <p><b>SĐT:</b> @Model.Customer.Phone</p>
+                </div>
+
+            </div>
+
+            <hr />
+
+            <!-- TABLE SẢN PHẨM -->
+            <table class="table table-bordered">
+
+                <thead class="table-dark">
+                    <tr>
+                        <th>#</th>
+                        <th>Sản phẩm</th>
+                        <th>Số lượng</th>
+                        <th>Đơn giá</th>
+                        <th>Thành tiền</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    @{
+                        int stt = 1;
+                        decimal total = 0;
+                    }
+
+                    @foreach (var item in details)
+                    {
+                        var sub = item.Quantity * item.UnitPrice;
+                        total += sub;
+
+                        <tr>
+                            <td>@stt</td>
+                            <td>@item.Product.Name</td>
+                            <td>@item.Quantity</td>
+                            <td>@item.UnitPrice.ToString("N0")</td>
+                            <td>@sub.ToString("N0")</td>
+                        </tr>
+
+                        stt++;
+                    }
+
+                </tbody>
+
+                <tfoot>
+                    <tr>
+                        <th colspan="4" class="text-end">TỔNG TIỀN:</th>
+                        <th class="text-danger">@total.ToString("N0") VND</th>
+                    </tr>
+                </tfoot>
+
+            </table>
+
+            <!-- TRẠNG THÁI -->
+            <div class="mt-3">
+                <b>Trạng thái:</b>
+
+                @switch (Model.Status)
+                {
+                    case 0:
+                        <span class="badge bg-warning text-dark">Chờ duyệt</span>
+                        break;
+                    case 1:
+                        <span class="badge bg-info">Đang giao</span>
+                        break;
+                    case 2:
+                        <span class="badge bg-success">Hoàn thành</span>
+                        break;
+                }
+            </div>
+
+            <div class="mt-4">
+                <a href="@Url.Action("Index", "Order")" class="btn btn-secondary">
+                    Quay lại
+                </a>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

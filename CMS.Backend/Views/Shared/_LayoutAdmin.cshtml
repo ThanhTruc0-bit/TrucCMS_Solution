@@ -7,29 +7,34 @@
 
     <title>@ViewData["Title"] - TrucCMS Admin</title>
 
-    <link rel="stylesheet"
-          href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
 
+    <!-- Bootstrap Icons -->
     <link rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
 
-    <link rel="stylesheet"
-          href="~/css/site.css"
-          asp-append-version="true" />
-
     <style>
+
+        body {
+            background: #f5f6fa;
+        }
 
         .sidebar {
             min-height: 100vh;
             background-color: #212529;
             color: white;
+            position: fixed;
+            width: 260px;
         }
 
             .sidebar a {
                 color: #adb5bd;
                 text-decoration: none;
                 display: block;
-                padding: 10px 20px;
+                padding: 10px 18px;
+                border-radius: 6px;
+                margin: 4px 10px;
             }
 
                 .sidebar a:hover {
@@ -37,10 +42,21 @@
                     color: white;
                 }
 
-            .sidebar .active {
-                background-color: #0d6efd;
-                color: white;
-            }
+                .sidebar a.active {
+                    background-color: #0d6efd;
+                    color: white;
+                }
+
+        .content {
+            margin-left: 260px;
+            padding: 20px;
+        }
+
+        .sidebar-header {
+            text-align: center;
+            padding: 20px;
+            border-bottom: 1px solid #495057;
+        }
 
     </style>
 
@@ -48,125 +64,81 @@
 
 <body>
 
-    <div class="container-fluid">
+    <div class="sidebar">
 
-        <div class="row">
+        <!-- HEADER -->
+        <div class="sidebar-header">
 
-            <!-- Sidebar -->
-            <nav class="col-md-3 col-lg-2 sidebar p-0">
+            <h4 class="text-white mb-1">TrucCMS Admin</h4>
 
-                <div class="p-3 text-center border-bottom border-secondary">
-
-                    <h4 class="text-white">
-                        TrucCMS Admin
-                    </h4>
-                    <ul class="navbar-nav ms-auto">
-                        @if (User.Identity.IsAuthenticated)
-                        {
-                            <li class="nav-item">
-                                <span class="nav-link text-dark">
-                                    Chào, <strong>@User.FindFirst("FullName")?.Value</strong> (@User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value)
-                                </span>
-                            </li>
-                            <li class="nav-item">
-                                <a class="btn btn-outline-danger btn-sm" asp-controller="Account" asp-action="Logout">Đăng xuất</a>
-                            </li>
-                        }
-                    </ul>
-
+            @if (User.Identity.IsAuthenticated)
+            {
+                <div class="text-light small">
+                    Xin chào:
+                    <strong>@User.Identity.Name</strong>
                 </div>
 
-                <div class="mt-3">
+                <a class="btn btn-sm btn-danger mt-2"
+                   asp-controller="Account"
+                   asp-action="Logout">
+                    Đăng xuất
+                </a>
+            }
 
-                    <a asp-controller="Home"
-                       asp-action="Index">
+        </div>
 
-                        <i class="bi bi-speedometer2"></i>
-                        Bảng điều khiển
+        <!-- MENU -->
+        <div class="mt-3">
 
-                    </a>
+            <a asp-controller="Home" asp-action="Index">
+                <i class="bi bi-speedometer2"></i> Dashboard
+            </a>
 
-                    <a asp-controller="Category"
-                       asp-action="Index">
+            <a asp-controller="Category" asp-action="Index">
+                <i class="bi bi-grid"></i> Danh mục
+            </a>
 
-                        <i class="bi bi-grid"></i>
-                        Quản lý Danh mục
+            <a asp-controller="Post" asp-action="Index">
+                <i class="bi bi-file-earmark-post"></i> Bài viết
+            </a>
 
-                    </a>
+            <a asp-controller="User" asp-action="Index">
+                <i class="bi bi-people"></i> Thành viên
+            </a>
 
-                    <a asp-controller="Post"
-                       asp-action="Index">
+            <a asp-controller="CategoryProduct" asp-action="Index">
+                <i class="bi bi-tags"></i> Danh mục sản phẩm
+            </a>
 
-                        <i class="bi bi-file-earmark-post"></i>
-                        Quản lý Bài viết
+            <a asp-controller="Product" asp-action="Index">
+                <i class="bi bi-box"></i> Sản phẩm
+            </a>
 
-                    </a>
+            <a asp-controller="Customer" asp-action="Index">
+                <i class="bi bi-person"></i> Khách hàng
+            </a>
 
-                    <a asp-controller="User"
-                       asp-action="Index">
+            <a asp-controller="Order" asp-action="Index">
+                <i class="bi bi-receipt"></i> Đơn hàng
+            </a>
 
-                        <i class="bi bi-people"></i>
-                        Quản lý Thành viên
-
-                    </a>
-
-                    <a asp-controller="ProductCategory"
-                       asp-action="Index">
-
-                        <i class="bi bi-grid"></i>
-                        Danh mục sản phẩm
-
-                    </a>
-
-                    <a asp-controller="Product"
-                       asp-action="Index">
-
-                        <i class="bi bi-box-seam"></i>
-                        Sản phẩm
-
-                    </a>
-
-                    <a asp-controller="Customer"
-                       asp-action="Index">
-
-                        <i class="bi bi-people"></i>
-                        Khách hàng
-
-                    </a>
-
-                    <a asp-controller="Order"
-                       asp-action="Index">
-
-                        <i class="bi bi-grid"></i>
-                        Đơn hàng
-
-                    </a>
-
-                    <a asp-controller="OrderDetail"
-                       asp-action="Index">
-
-                        <i class="bi bi-grid"></i>
-                        Đơn hàng chi tiết
-
-                    </a>
-
-                </div>
-
-            </nav>
-
-            <!-- Nội dung -->
-            <main class="col-md-9 col-lg-10 ms-sm-auto p-4">
-
-                @RenderBody()
-
-            </main>
+            <a asp-controller="OrderDetail" asp-action="Index">
+                <i class="bi bi-card-list"></i> Chi tiết đơn hàng
+            </a>
 
         </div>
 
     </div>
 
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <!-- CONTENT -->
+    <main class="content">
 
+        @RenderBody()
+
+    </main>
+
+    <!-- JS -->
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 
     @await RenderSectionAsync("Scripts", required: false)

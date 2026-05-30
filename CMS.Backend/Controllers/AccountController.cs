@@ -1,4 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿/*
+Họ Tên: Nguyễn Thị Thanh Trúc
+MSSV: 2123110119
+Lớp: CCQ2311D
+Ngày tạo: 15/05/2026
+Mô tả: Thực thể danh mục 
+ */
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using System.Security.Claims;
@@ -53,15 +60,6 @@ public class AccountController : Controller
         );
 
         // redirect theo role
-        if (role == "Admin")
-        {
-            return RedirectToAction("Index", "Home");
-        }
-        else if (role == "Editor")
-        {
-            return RedirectToAction("Index", "Post");
-        }
-
         return RedirectToAction("Index", "Home");
     }
 
