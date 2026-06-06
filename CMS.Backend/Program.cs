@@ -1,6 +1,7 @@
 ﻿using CMS.Data;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
+using Grpc.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,6 +29,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 // =============================
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+//Grpc
+builder.Services.AddGrpc();
 // 1. Khai báo chính sách CORS
 builder.Services.AddCors(options => {
     options.AddPolicy("AllowAll", policy => {
@@ -64,9 +67,13 @@ app.UseCors("AllowAll");
 
 app.UseAuthentication();
 app.UseAuthorization();
+// GRPC
+// =============================
+app.MapGrpcService<PostGrpcService>();
 
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
 
 app.Run();

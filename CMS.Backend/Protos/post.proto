@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+option csharp_namespace = "CMS.Backend";
+
+service PostService {
+  rpc GetPost (PostRequest) returns (PostReply);
+}
+
+message PostRequest {
+  int32 id = 1;
+}
+
+message PostReply {
+  int32 id = 1;
+  string title = 2;
+  string content = 3;
+}
