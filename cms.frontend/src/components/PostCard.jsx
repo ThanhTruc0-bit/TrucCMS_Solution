@@ -1,11 +1,9 @@
-﻿/*
-Họ Tên: Nguyễn Thị Thanh Trúc
-MSSV: 2123110119
-Lớp: CCQ2311D
-Ngày tạo: 15/05/2026
-Mô tả: Thực thể danh mục 
- */
+﻿import { Link } from "react-router-dom";
+
 export default function PostCard(props) {
+
+    const BASE_URL = "https://localhost:7194";
+
     return (
         <div style={{
             border: "1px solid #ccc",
@@ -13,9 +11,14 @@ export default function PostCard(props) {
             width: 250,
             margin: 10
         }}>
-            <img src={props.image} width="100%" />
+            <img src={BASE_URL + props.image} width="100%" />
 
-            <h3>{props.title}</h3>
+            {/* 🔥 click vào tiêu đề */}
+            <h3>
+                <Link to={`/post/${props.id}`}>
+                    {props.title}
+                </Link>
+            </h3>
 
             <p>{props.content}</p>
         </div>

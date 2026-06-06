@@ -1,67 +1,70 @@
-const BASE_URL = "https://localhost:7194/api";
+﻿const BASE_URL = "https://localhost:7194/api";
+const request = async (url, options = {}) => {
+    try {
+        const res = await fetch(url, options);
 
-// ===== AUTH =====
-export const login = async (data) => {
-    const res = await fetch(`${BASE_URL}/Auth/CustomerLogin`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-    });
+        if (!res.ok) {
+            throw new Error(`HTTP error! status: ${res.status}`);
+        }
 
-    return res.json();
+        return await res.json();
+    } catch (error) {
+        console.error("API ERROR:", error);
+        throw error;
+    }
 };
 
-export const register = async (data) => {
-    const res = await fetch(`${BASE_URL}/Auth/CustomerRegister`, {
+// ===== AUTH =====
+export const login = (data) => {
+    return request(`${BASE_URL}/Auth/CustomerLogin`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
         },
         body: JSON.stringify(data),
     });
+};
 
-    return res.json();
+export const register = (data) => {
+    return request(`${BASE_URL}/Auth/CustomerRegister`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+    });
 };
 
 // ===== PRODUCTS =====
-export const getProducts = async () => {
-    const res = await fetch(`${BASE_URL}/Products`);
-    return res.json();
+export const getProducts = () => {
+    return request(`${BASE_URL}/Products`);
 };
 
-export const getProductById = async (id) => {
-    const res = await fetch(`${BASE_URL}/Products/${id}`);
-    return res.json();
+export const getProductById = (id) => {
+    return request(`${BASE_URL}/Products/${id}`);
 };
 
 // ===== CATEGORY =====
-export const getCategories = async () => {
-    const res = await fetch(`${BASE_URL}/CategoriesProducts`);
-    return res.json();
+export const getCategories = () => {
+    return request(`${BASE_URL}/CategoriesProducts`);
 };
 
 // ===== POSTS =====
-export const getPosts = async () => {
-    const res = await fetch(`${BASE_URL}/Posts`);
-    return res.json();
+export const getPosts = () => {
+    return request(`${BASE_URL}/Posts`);
 };
 
 // ===== ORDER =====
-export const createOrder = async (data) => {
-    const res = await fetch(`${BASE_URL}/Orders`, {
+export const createOrder = (data) => {
+    return request(`${BASE_URL}/Orders`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
         },
         body: JSON.stringify(data),
     });
-
-    return res.json();
 };
 
-export const getOrdersByCustomer = async (customerId) => {
-    const res = await fetch(`${BASE_URL}/Orders/customer/${customerId}`);
-    return res.json();
+export const getOrdersByCustomer = (customerId) => {
+    return request(`${BASE_URL}/Orders/customer/${customerId}`);
 };

@@ -1,42 +1,34 @@
-﻿/*
-Họ Tên: Nguyễn Thị Thanh Trúc
-MSSV: 2123110119
-Lớp: CCQ2311D
-Ngày tạo: 15/05/2026
-Mô tả: Thực thể danh mục 
- */
-import { useState } from "react";
+﻿import { useEffect, useState } from "react";
 import PostCard from "../components/PostCard";
+import { getPosts } from "../services/ApiService";
 
 export default function Home() {
-    const [posts, setPosts] = useState([
-        {
-            title: "Xu hướng 2026",
-            image: "https://via.placeholder.com/150",
-            content: "Thời trang mới nhất..."
-        },
-        {
-            title: "Mix đồ đẹp",
-            image: "https://via.placeholder.com/150",
-            content: "Cách phối đồ..."
-        },
-        {
-            title: "Mặc đẹp mỗi ngày",
-            image: "https://via.placeholder.com/150",
-            content: "Gợi ý outfit..."
+    const [posts, setPosts] = useState([]);
+
+    useEffect(() => {
+        fetchPosts();
+    }, []);
+
+    const fetchPosts = async () => {
+        try {
+            const data = await getPosts();
+            setPosts(data);
+        } catch (error) {
+            console.log("Lỗi:", error);
         }
-    ]);
+    };
 
     return (
         <div>
             <h1>Tin tức</h1>
 
             <div style={{ display: "flex" }}>
-                {posts.map((p, index) => (
+                {posts.map((p) => (
                     <PostCard
-                        key={index}
+                        key={p.id}
+                        id={p.id}
                         title={p.title}
-                        image={p.image}
+                        image={p.imageUrl}
                         content={p.content}
                     />
                 ))}
