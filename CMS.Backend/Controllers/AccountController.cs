@@ -60,7 +60,7 @@ public class AccountController : Controller
         );
 
         // redirect theo role
-        return RedirectToAction("Index", "Home");
+        return RedirectToAction("Index", "Dashboard");
     }
 
     public async Task<IActionResult> Logout()
