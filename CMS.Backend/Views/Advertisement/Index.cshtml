@@ -1,0 +1,105 @@
+﻿@model IEnumerable<CMS.Data.Entities.Advertisement>
+
+@{
+    Layout = "_LayoutAdmin";
+}
+
+<div class="container mt-4">
+
+    <!-- HEADER -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="fw-bold text-primary">
+            🎯 QUẢN LÝ BANNER
+        </h2>
+
+        <a asp-action="Create" class="btn btn-success shadow-sm">
+            <i class="bi bi-plus-circle"></i>
+            Thêm banner
+        </a>
+    </div>
+
+    <!-- ALERT -->
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success shadow-sm">
+            @TempData["Success"]
+        </div>
+    }
+
+    <!-- TABLE -->
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-0">
+
+            <table class="table table-hover align-middle mb-0">
+
+                <thead class="table-dark">
+                    <tr>
+                        <th width="60">ID</th>
+                        <th>Tiêu đề</th>
+                        <th>Ảnh</th>
+                        <th>Hiển thị</th>
+                        <th width="200" class="text-center">Thao tác</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@item.Id</td>
+
+                                <td class="fw-semibold">
+                                    @item.Title
+                                </td>
+
+                                <td>
+                                    <img src="@item.ImageUrl"
+                                         width="120"
+                                         style="border-radius:10px" />
+                                </td>
+
+                                <td>
+                                    @if (item.IsActive)
+                                    {
+                                        <span class="badge bg-success">Hiển thị</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">Ẩn</span>
+                                    }
+                                </td>
+
+                                <td class="text-center">
+                                    <a asp-action="Edit"
+                                       asp-route-id="@item.Id"
+                                       class="btn btn-sm btn-warning me-1">
+                                        ✏ Sửa
+                                    </a>
+
+                                    <a asp-action="Delete"
+                                       asp-route-id="@item.Id"
+                                       class="btn btn-sm btn-danger"
+                                       onclick="return confirm('Xóa banner này?')">
+                                        🗑 Xóa
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="5" class="text-center text-muted py-4">
+                                Không có banner nào
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+
+            </table>
+
+        </div>
+    </div>
+</div>

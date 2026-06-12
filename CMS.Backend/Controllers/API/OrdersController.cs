@@ -9,6 +9,7 @@ using CMS.Backend.Models;
 using CMS.Data;
 using CMS.Data.Entities;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace CMS.Backend.Controllers.API
 {
@@ -39,8 +40,16 @@ namespace CMS.Backend.Controllers.API
 
             foreach (var item in request.Items)
             {
-                var product = _context.Products.Find(item.ProductId);
-                if (product == null) continue;
+                var product = _context.Products.FirstOrDefault(p => p.Id == item.ProductId);
+
+                if (product == null)
+                    return BadRequest($"Product {item.ProductId} not found");
+
+                // ❗ FIX 1: check tồn kho
+                if (item.Quantity > product.StockQuantity)
+                {
+                    return BadRequest($"Sản phẩm {product.Name} không đủ số lượng");
+                }
 
                 var detail = new OrderDetail
                 {
@@ -63,22 +72,27 @@ namespace CMS.Backend.Controllers.API
                 orderId = order.Id
             });
         }
+
         [HttpGet("customer/{customerId}")]
         public IActionResult GetByCustomer(int customerId)
         {
             var orders = _context.Orders
+                .Include(o => o.OrderDetails) // ❗ FIX 2
                 .Where(o => o.CustomerId == customerId)
-                .Select(o => new {
+                .Select(o => new
+                {
                     o.Id,
                     o.OrderDate,
                     o.Status,
                     o.Notes,
-                    Details = o.OrderDetails.Select(d => new {
+                    Details = o.OrderDetails.Select(d => new
+                    {
                         d.ProductId,
                         d.Quantity,
                         d.UnitPrice
                     })
-                }).ToList();
+                })
+                .ToList();
 
             return Ok(orders);
         }

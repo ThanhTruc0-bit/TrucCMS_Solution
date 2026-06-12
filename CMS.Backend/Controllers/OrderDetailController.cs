@@ -5,14 +5,16 @@ Lớp: CCQ2311D
 Ngày tạo: 15/05/2026
 Mô tả: Thực thể danh mục 
  */
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using CMS.Data;
 using CMS.Data.Entities;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 using System.Linq;
 
 namespace CMS.Backend.Controllers
 {
+    [Authorize(Roles = "Admin,Editor")]
     public class OrderDetailController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -22,7 +24,6 @@ namespace CMS.Backend.Controllers
             _context = context;
         }
 
-        // LIST
         public IActionResult Index()
         {
             var orderDetails = _context.OrderDetails
@@ -33,19 +34,15 @@ namespace CMS.Backend.Controllers
             return View(orderDetails);
         }
 
-        // EDIT GET
         [HttpGet]
         public IActionResult Edit(int id)
         {
             var detail = _context.OrderDetails.Find(id);
-
-            if (detail == null)
-                return NotFound();
+            if (detail == null) return NotFound();
 
             return View(detail);
         }
 
-        // EDIT POST
         [HttpPost]
         public IActionResult Edit(OrderDetail model)
         {
@@ -59,7 +56,6 @@ namespace CMS.Backend.Controllers
             return View(model);
         }
 
-        // DELETE
         public IActionResult Delete(int id)
         {
             var detail = _context.OrderDetails.Find(id);

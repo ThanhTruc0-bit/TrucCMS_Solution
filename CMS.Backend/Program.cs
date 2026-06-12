@@ -1,7 +1,13 @@
 ﻿using CMS.Data;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.EntityFrameworkCore;
 using Grpc.AspNetCore;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.StaticFiles;
+using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Serialization;
+
+var provider = new FileExtensionContentTypeProvider();
+provider.Mappings[".avif"] = "image/avif";
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,7 +23,12 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 builder.Services.AddAuthorization();
 
 // MVC
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler =
+            ReferenceHandler.IgnoreCycles;
+    });
 
 // DbContext
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -29,13 +40,15 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 // =============================
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-//Grpc
+
+// Grpc
 builder.Services.AddGrpc();
+
 // 1. Khai báo chính sách CORS
 builder.Services.AddCors(options => {
     options.AddPolicy("AllowAll", policy => {
         // Cho phép mọi nguồn (Origin), mọi phương thức (GET, POST...), mọi tiêu đề (Header)
-        policy.AllowAnyOrigin()
+        policy.WithOrigins("http://localhost:3000")
               .AllowAnyMethod()
               .AllowAnyHeader();
     });
@@ -59,21 +72,25 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseStaticFiles();
-
+//app.UseStaticFiles();
+app.UseStaticFiles(new StaticFileOptions
+{
+    ContentTypeProvider = provider
+});
 app.UseRouting();
+
 // 2. Kích hoạt chính sách CORS đã khai báo ở trên
 app.UseCors("AllowAll");
 
 app.UseAuthentication();
 app.UseAuthorization();
+//
+app.MapControllers();
 // GRPC
-// =============================
 app.MapGrpcService<PostGrpcService>();
 
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
-
 
 app.Run();

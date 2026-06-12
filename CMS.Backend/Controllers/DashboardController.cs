@@ -7,10 +7,12 @@ Mô tả: Thực thể danh mục
  */
 using CMS.Data;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using System.Linq;
 
 namespace CMS.Backend.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class DashboardController : Controller
     {
         private readonly ApplicationDbContext _context;

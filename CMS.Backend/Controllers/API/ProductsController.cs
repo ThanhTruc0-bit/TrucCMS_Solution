@@ -7,7 +7,9 @@ Mô tả: Thực thể danh mục
  */
 using Microsoft.AspNetCore.Mvc;
 using CMS.Data;
+using CMS.Data.Entities;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace CMS.Backend.Controllers.API
 {
@@ -22,7 +24,6 @@ namespace CMS.Backend.Controllers.API
             _context = context;
         }
 
-        // GET: api/Products
         [HttpGet]
         public IActionResult GetAll()
         {
@@ -34,6 +35,7 @@ namespace CMS.Backend.Controllers.API
                     p.Name,
                     p.Price,
                     p.ImageUrl,
+                    p.StockQuantity,
                     p.CategoryProductId,
                     CategoryName = p.CategoryProduct.Name
                 })
@@ -42,7 +44,6 @@ namespace CMS.Backend.Controllers.API
             return Ok(products);
         }
 
-        // GET: api/Products/5
         [HttpGet("{id}")]
         public IActionResult GetById(int id)
         {
@@ -68,7 +69,6 @@ namespace CMS.Backend.Controllers.API
             return Ok(product);
         }
 
-        // GET: api/Products/category/1
         [HttpGet("category/{categoryProductId}")]
         public IActionResult GetByCategory(int categoryProductId)
         {
@@ -87,6 +87,80 @@ namespace CMS.Backend.Controllers.API
                 .ToList();
 
             return Ok(products);
+        }
+
+        [HttpPost]
+        public IActionResult Create(Product model)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            _context.Products.Add(model);
+            _context.SaveChanges();
+
+            return Ok(model);
+        }
+
+        [HttpPut("{id}")]
+        public IActionResult Update(int id, Product model)
+        {
+            var product = _context.Products.FirstOrDefault(p => p.Id == id);
+
+            if (product == null)
+                return NotFound();
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            product.Name = model.Name;
+            product.Price = model.Price;
+            product.Description = model.Description;
+            product.StockQuantity = model.StockQuantity;
+
+            // FIX AN TOÀN: tránh null overwrite
+            product.ImageUrl = model.ImageUrl ?? product.ImageUrl;
+
+            product.CategoryProductId = model.CategoryProductId;
+
+            _context.SaveChanges();
+
+            return Ok(product);
+        }
+
+        [HttpDelete("{id}")]
+        public IActionResult Delete(int id)
+        {
+            var product = _context.Products.FirstOrDefault(p => p.Id == id);
+
+            if (product == null)
+                return NotFound();
+
+            _context.Products.Remove(product);
+            _context.SaveChanges();
+
+            return Ok(new { message = "Deleted successfully" });
+        }
+
+        [HttpGet("paging")]
+        public IActionResult GetPaging(int page = 1, int pageSize = 10)
+        {
+            var data = _context.Products
+                .Include(p => p.CategoryProduct)
+                .OrderByDescending(p => p.Id)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .Select(p => new
+                {
+                    p.Id,
+                    p.Name,
+                    p.Price,
+                    p.ImageUrl,
+                    p.StockQuantity,
+                    CategoryName = p.CategoryProduct.Name
+                })
+                .ToList();
+
+            return Ok(data);
         }
     }
 }

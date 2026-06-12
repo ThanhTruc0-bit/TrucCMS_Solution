@@ -9,10 +9,12 @@ using CMS.Data;
 using CMS.Data.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 using System.Linq;
 
 namespace CMS.Backend.Controllers
 {
+    [Authorize(Roles = "Admin,Editor")]
     public class OrderController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -22,7 +24,6 @@ namespace CMS.Backend.Controllers
             _context = context;
         }
 
-        // LIST ORDER
         public IActionResult Index()
         {
             var orders = _context.Orders
@@ -32,15 +33,13 @@ namespace CMS.Backend.Controllers
             return View(orders);
         }
 
-        // DETAILS (BILL)
         public IActionResult Details(int id)
         {
             var order = _context.Orders
                 .Include(o => o.Customer)
                 .FirstOrDefault(o => o.Id == id);
 
-            if (order == null)
-                return NotFound();
+            if (order == null) return NotFound();
 
             var orderDetails = _context.OrderDetails
                 .Include(od => od.Product)
@@ -52,21 +51,16 @@ namespace CMS.Backend.Controllers
             return View(order);
         }
 
-        // EDIT GET
         [HttpGet]
         public IActionResult Edit(int id)
         {
             var order = _context.Orders.Find(id);
-
-            if (order == null)
-                return NotFound();
+            if (order == null) return NotFound();
 
             ViewBag.Customers = _context.Customers.ToList();
-
             return View(order);
         }
 
-        // EDIT POST
         [HttpPost]
         public IActionResult Edit(Order model)
         {
@@ -81,7 +75,6 @@ namespace CMS.Backend.Controllers
             return View(model);
         }
 
-        // DELETE
         public IActionResult Delete(int id)
         {
             var order = _context.Orders.Find(id);

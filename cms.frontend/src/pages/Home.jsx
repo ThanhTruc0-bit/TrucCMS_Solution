@@ -1,38 +1,28 @@
-﻿import { useEffect, useState } from "react";
-import PostCard from "../components/PostCard";
-import { getPosts } from "../services/ApiService";
+﻿import Header from "../components/Header";
+import HeroBanner from "../components/HeroBanner";
+import CategoryMenu from "../components/CategoryMenu";
+import ProductGrid from "../components/ProductGrid"; // ✅ dùng cái này
+import BlogSection from "../components/BlogSection";
+import Footer from "../components/Footer";
 
 export default function Home() {
-    const [posts, setPosts] = useState([]);
-
-    useEffect(() => {
-        fetchPosts();
-    }, []);
-
-    const fetchPosts = async () => {
-        try {
-            const data = await getPosts();
-            setPosts(data);
-        } catch (error) {
-            console.log("Lỗi:", error);
-        }
-    };
-
     return (
-        <div>
-            <h1>Tin tức</h1>
+        <div style={{ fontFamily: "serif", background: "#fafafa" }}>
 
-            <div style={{ display: "flex" }}>
-                {posts.map((p) => (
-                    <PostCard
-                        key={p.id}
-                        id={p.id}
-                        title={p.title}
-                        image={p.imageUrl}
-                        content={p.content}
-                    />
-                ))}
-            </div>
+            <Header />
+
+            <HeroBanner />
+
+            <CategoryMenu />
+
+            {/* ✅ SẢN PHẨM */}
+            <ProductGrid />
+
+            {/* ✅ BÀI VIẾT */}
+            <BlogSection />
+
+            <Footer />
+
         </div>
     );
 }

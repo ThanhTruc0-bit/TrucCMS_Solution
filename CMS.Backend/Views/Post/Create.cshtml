@@ -42,6 +42,7 @@
                             </label>
 
                             <textarea asp-for="Content"
+                                      id="Content"
                                       class="form-control"
                                       rows="10"
                                       placeholder="Viết nội dung tại đây..."></textarea>
@@ -79,8 +80,8 @@
                             <input type="file"
                                    name="uploadImage"
                                    class="form-control" />
-
                         </div>
+
                         <div class="mb-3">
 
                             <label class="form-label fw-bold">
@@ -91,7 +92,6 @@
                                    type="date"
                                    class="form-control"
                                    value="@DateTime.Now.ToString("yyyy-MM-dd")" />
-
                         </div>
 
                         <hr />
@@ -132,13 +132,10 @@
     <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
 
     <script>
-
-        // Kích hoạt CKEditor cho textarea Content
         ClassicEditor
             .create(document.querySelector('#Content'))
             .catch(error => {
                 console.error(error);
             });
-
     </script>
 }

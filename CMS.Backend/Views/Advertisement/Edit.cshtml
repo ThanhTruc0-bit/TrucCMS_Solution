@@ -1,0 +1,54 @@
+﻿@model CMS.Data.Entities.Advertisement
+
+@{
+    Layout = "_LayoutAdmin";
+}
+
+<div class="container mt-4">
+
+    <h2 class="text-warning fw-bold">
+        ✏ CHỈNH SỬA BANNER
+    </h2>
+    <hr />
+
+    <form asp-action="Edit" method="post" enctype="multipart/form-data">
+
+        <input type="hidden" asp-for="Id" />
+
+        <div class="mb-3">
+            <label class="form-label fw-semibold">Tiêu đề</label>
+            <input asp-for="Title" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label fw-semibold">Mô tả</label>
+            <textarea asp-for="Description" class="form-control"></textarea>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label fw-semibold">Ảnh hiện tại</label><br />
+            <img src="@Model.ImageUrl"
+                 width="200"
+                 style="border-radius:10px" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label fw-semibold">Chọn ảnh mới</label>
+            <input type="file" name="uploadImage" class="form-control" />
+        </div>
+
+        <div class="form-check mb-3">
+            <input asp-for="IsActive" class="form-check-input" />
+            <label class="form-check-label">Hiển thị banner</label>
+        </div>
+
+        <button type="submit" class="btn btn-warning">
+            Cập nhật
+        </button>
+
+        <a asp-action="Index" class="btn btn-secondary">
+            Hủy
+        </a>
+
+    </form>
+</div>

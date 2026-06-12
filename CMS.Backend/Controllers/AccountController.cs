@@ -10,7 +10,6 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using System.Security.Claims;
 using CMS.Data;
-using System.Linq;
 
 public class AccountController : Controller
 {
@@ -21,54 +20,77 @@ public class AccountController : Controller
         _context = context;
     }
 
+    // =========================
+    // LOGIN GET
+    // =========================
     [HttpGet]
     public IActionResult Login()
     {
         return View();
     }
 
+    // =========================
+    // LOGIN POST
+    // =========================
     [HttpPost]
     public async Task<IActionResult> Login(string username, string password)
     {
-        var user = _context.Users
-            .FirstOrDefault(u => u.Username == username && u.PasswordHash == password);
-
-        if (user == null)
+        try
         {
-            ViewBag.Error = "Sai tài khoản hoặc mật khẩu!";
+            var user = _context.Users
+                .FirstOrDefault(u =>
+                    u.Username == username &&
+                    u.PasswordHash == password);
+
+            if (user == null)
+            {
+                ViewBag.Error = "Sai tài khoản hoặc mật khẩu!";
+                return View();
+            }
+
+            var role = user.Role?.Trim() ?? "User";
+
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name, user.Username),
+                new Claim(ClaimTypes.Role, role),
+                new Claim("FullName", user.FullName ?? "")
+            };
+
+            var identity = new ClaimsIdentity(
+                claims,
+                CookieAuthenticationDefaults.AuthenticationScheme
+            );
+
+            await HttpContext.SignInAsync(
+                CookieAuthenticationDefaults.AuthenticationScheme,
+                new ClaimsPrincipal(identity)
+            );
+
+            return RedirectToAction("Index", "Dashboard");
+        }
+        catch
+        {
+            ViewBag.Error = "Có lỗi xảy ra, vui lòng thử lại!";
             return View();
         }
+    }
 
-        // 🔴 FIX: chuẩn hoá role
-        var role = user.Role?.Trim();
-
-        var claims = new List<Claim>
-        {
-            new Claim(ClaimTypes.Name, user.Username),
-            new Claim(ClaimTypes.Role, role),
-            new Claim("FullName", user.FullName ?? "")
-        };
-
-        var claimsIdentity = new ClaimsIdentity(
-            claims,
+    // =========================
+    // LOGOUT
+    // =========================
+    public async Task<IActionResult> Logout()
+    {
+        await HttpContext.SignOutAsync(
             CookieAuthenticationDefaults.AuthenticationScheme
         );
 
-        await HttpContext.SignInAsync(
-            CookieAuthenticationDefaults.AuthenticationScheme,
-            new ClaimsPrincipal(claimsIdentity)
-        );
-
-        // redirect theo role
-        return RedirectToAction("Index", "Dashboard");
-    }
-
-    public async Task<IActionResult> Logout()
-    {
-        await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
         return RedirectToAction("Login");
     }
 
+    // =========================
+    // ACCESS DENIED
+    // =========================
     public IActionResult AccessDenied()
     {
         return View();

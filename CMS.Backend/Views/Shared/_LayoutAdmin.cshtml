@@ -75,7 +75,20 @@
             {
                 <div class="text-light small">
                     Xin chào:
-                    <strong>@User.Identity.Name</strong>
+                    @using System.Security.Claims
+
+                @{
+                        var fullName = User.FindFirst("FullName")?.Value;
+                        var role = User.FindFirst(ClaimTypes.Role)?.Value;
+                    }
+
+                    <div class="text-light small">
+                        👤 <strong>@fullName</strong>
+                    </div>
+
+                    <div class="text-warning small">
+                        Vai trò: @role
+                    </div>
                 </div>
 
                 <a class="btn btn-sm btn-danger mt-2"
@@ -124,6 +137,10 @@
 
             <a asp-controller="OrderDetail" asp-action="Index">
                 <i class="bi bi-card-list"></i> Chi tiết đơn hàng
+            </a>
+
+            <a asp-controller="Advertisement" asp-action="Index">
+                <i class="bi bi-image"></i> Banner
             </a>
 
         </div>

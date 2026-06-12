@@ -5,84 +5,140 @@ Lớp: CCQ2311D
 Ngày tạo: 15/05/2026
 Mô tả: Thực thể danh mục 
  */
+using CMS.Data;
+using CMS.Data.Entities;
 using Microsoft.AspNetCore.Mvc;
-using CMS.Data; 
+using Microsoft.EntityFrameworkCore;
 
-namespace CMS.Backend.Controllers
+namespace CMS.Backend.Controllers.API
 {
-    // 1. Định nghĩa đường dẫn để gọi API. [controller] sẽ tự lấy tên "Posts"
-    // Khi chạy, địa chỉ sẽ là: https://localhost:xxxx/api/posts
     [Route("api/[controller]")]
-
-    // 2. Đánh dấu đây là một API Controller để hệ thống hỗ trợ các tính năng RESTful
     [ApiController]
-
-    // 3. API Controller phải kế thừa từ ControllerBase (thay vì Controller như MVC)
     public class PostsController : ControllerBase
     {
-        // 4. Khai báo biến kết nối Database
         private readonly ApplicationDbContext _context;
 
-        // 5. Hàm khởi tạo (Constructor): "Tiêm" kết nối Database vào để sử dụng
         public PostsController(ApplicationDbContext context)
         {
             _context = context;
         }
-        // 1. Chỉ định đây là phương thức GET (Dùng để lấy dữ liệu)
+
+        // =========================
+        // GET ALL
+        // =========================
         [HttpGet]
         public IActionResult GetAll()
         {
-            // Lấy dữ liệu từ bảng Posts
             var posts = _context.Posts
-                .OrderByDescending(p => p.Id) // Sắp xếp bài mới nhất lên đầu
-                .Select(p => new {            // "Gọt tỉa" dữ liệu: chỉ lấy những trường cần thiết
+                .OrderByDescending(p => p.Id)
+                .Select(p => new
+                {
                     p.Id,
                     p.Title,
                     p.ImageUrl,
-                    CreatedAt = p.CreatedDate,
-                    CategoryName = p.Category.Name // Lấy tên danh mục thay vì chỉ lấy ID
-                })
-                .ToList();
-
-            // Trả về kết quả cho Frontend kèm mã trạng thái 200 (Thành công)
-            return Ok(posts);
-        }
-        // 2. Định nghĩa đường dẫn có tham số: api/posts/category/{id}
-        [HttpGet("category/{categoryId}")]
-        public IActionResult GetByCategory(int categoryId)
-        {
-            // Lọc các bài viết có CategoryId trùng với ID truyền vào từ URL
-            var posts = _context.Posts
-                .Where(p => p.CategoryId == categoryId)
-                .Select(p => new {
-                    p.Id,
-                    p.Title,
-                    p.ImageUrl,
-                    CreatedAt = p.CreatedDate,
+                    p.CategoryId,
+                    CreatedAt = p.CreatedDate
                 })
                 .ToList();
 
             return Ok(posts);
         }
-        // 1. Định nghĩa đường dẫn nhận ID: api/posts/{id}
+
+        // =========================
+        // GET BY ID
+        // =========================
         [HttpGet("{id}")]
         public IActionResult GetDetail(int id)
         {
-            // 2. Tìm bài viết đầu tiên có Id khớp với tham số truyền vào
             var post = _context.Posts
+                .Include(p => p.Category)
                 .FirstOrDefault(p => p.Id == id);
 
-            // 3. Xử lý trường hợp không tìm thấy (ID không tồn tại)
             if (post == null)
-            {
-                // Trả về lỗi 404 kèm thông báo dưới dạng JSON
-                return NotFound(new { message = "Không tìm thấy bài viết này trong hệ thống" });
-            }
+                return NotFound();
 
-            // 4. Trả về bài viết tìm thấy kèm mã 200 (Thành công)
+            return Ok(new
+            {
+                post.Id,
+                post.Title,
+                post.Content,
+                post.ImageUrl,
+                post.CategoryId,
+                CategoryName = post.Category.Name,
+                post.CreatedDate
+            });
+        }
+
+        // =========================
+        // POST
+        // =========================
+        [HttpPost]
+        public IActionResult Create(Post model)
+        {
+            model.CreatedDate = DateTime.Now;
+
+            _context.Posts.Add(model);
+            _context.SaveChanges();
+
+            return Ok(model);
+        }
+
+        // =========================
+        // PUT
+        // =========================
+        [HttpPut("{id}")]
+        public IActionResult Update(int id, Post model)
+        {
+            var post = _context.Posts.FirstOrDefault(p => p.Id == id);
+
+            if (post == null)
+                return NotFound();
+
+            post.Title = model.Title;
+            post.Content = model.Content;
+            post.ImageUrl = model.ImageUrl;
+            post.CategoryId = model.CategoryId;
+
+            _context.SaveChanges();
+
             return Ok(post);
         }
 
+        // =========================
+        // DELETE
+        // =========================
+        [HttpDelete("{id}")]
+        public IActionResult Delete(int id)
+        {
+            var post = _context.Posts.FirstOrDefault(p => p.Id == id);
 
+            if (post == null)
+                return NotFound();
+
+            _context.Posts.Remove(post);
+            _context.SaveChanges();
+
+            return Ok(new { message = "Deleted successfully" });
+        }
+        [HttpGet("paging")]
+        public IActionResult GetPaging(int page = 1, int pageSize = 10)
+        {
+            var data = _context.Posts
+                .OrderByDescending(p => p.Id)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .Select(p => new
+                {
+                    p.Id,
+                    p.Title,
+                    p.Content, 
+                    p.ImageUrl,
+                    p.CategoryId,
+                    p.CreatedDate
+                })
+                .ToList();
+
+            return Ok(data);
+        }
     }
 }
