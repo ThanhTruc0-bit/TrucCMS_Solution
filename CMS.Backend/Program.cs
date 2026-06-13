@@ -1,9 +1,11 @@
 ﻿using CMS.Data;
 using Grpc.AspNetCore;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
+using Microsoft.Extensions.FileProviders;
 
 var provider = new FileExtensionContentTypeProvider();
 provider.Mappings[".avif"] = "image/avif";
@@ -53,7 +55,10 @@ builder.Services.AddCors(options => {
               .AllowAnyHeader();
     });
 });
-
+builder.Services.Configure<ApiBehaviorOptions>(options =>
+{
+    options.SuppressModelStateInvalidFilter = true;
+});
 var app = builder.Build();
 
 // =============================
@@ -72,10 +77,13 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-//app.UseStaticFiles();
+app.UseStaticFiles();
+
 app.UseStaticFiles(new StaticFileOptions
 {
-    ContentTypeProvider = provider
+    FileProvider = new PhysicalFileProvider(
+        Path.Combine(builder.Environment.WebRootPath, "uploads")),
+    RequestPath = "/uploads"
 });
 app.UseRouting();
 

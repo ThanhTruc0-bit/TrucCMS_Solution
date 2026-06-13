@@ -1,29 +1,46 @@
 ﻿import { useEffect, useState } from "react";
 
+const BASE = "https://localhost:7194";
+
 export default function HeroBanner() {
     const [banners, setBanners] = useState([]);
     const [index, setIndex] = useState(0);
 
+    // LOAD DATA
     useEffect(() => {
-        fetch("https://localhost:7194/api/Advertisements")
+        fetch(`${BASE}/api/Advertisements`)
             .then(res => res.json())
             .then(data => setBanners(data))
-            .catch(err => console.log(err));
+            .catch(err => console.log("Banner error:", err));
     }, []);
 
     // AUTO SLIDE
     useEffect(() => {
-        if (banners.length === 0) return;
+        if (!banners.length) return;
 
         const interval = setInterval(() => {
             setIndex(prev => (prev + 1) % banners.length);
         }, 4000);
 
         return () => clearInterval(interval);
-    }, [banners]);
+    }, [banners.length]);
 
-    if (banners.length === 0) {
-        return <div style={{ height: 400 }}>Đang tải banner...</div>;
+    // SAFE CURRENT ITEM
+    const current = banners[index];
+
+    // FIX IMAGE PATH
+    const fixUrl = (url) => {
+        if (!url) return "";
+        return url.startsWith("/") ? url : "/" + url;
+    };
+
+    // LOADING STATE
+    if (!banners.length) {
+        return (
+            <div style={{ height: 500, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                Đang tải banner...
+            </div>
+        );
     }
 
     return (
@@ -34,12 +51,12 @@ export default function HeroBanner() {
             overflow: "hidden"
         }}>
 
-            {/* IMAGE SLIDER */}
+            {/* SLIDES */}
             {banners.map((b, i) => (
                 <img
                     key={b.id}
-                    src={`https://localhost:7194${b.imageUrl}`}
-                    alt={b.title}
+                    src={`${BASE}${fixUrl(b.imageUrl)}`}
+                    alt={b.title || "banner"}
                     style={{
                         position: "absolute",
                         width: "100%",
@@ -53,15 +70,15 @@ export default function HeroBanner() {
                 />
             ))}
 
-            {/* OVERLAY ĐEN */}
+            {/* DARK OVERLAY */}
             <div style={{
                 position: "absolute",
                 width: "100%",
                 height: "100%",
                 background: "rgba(0,0,0,0.4)"
-            }}></div>
+            }} />
 
-            {/* TEXT CHÍNH */}
+            {/* TEXT CONTENT */}
             <div style={{
                 position: "absolute",
                 top: "50%",
@@ -76,7 +93,7 @@ export default function HeroBanner() {
                     marginBottom: 15,
                     letterSpacing: 2
                 }}>
-                    {banners[index].title}
+                    {current?.title}
                 </h1>
 
                 <p style={{
@@ -84,7 +101,7 @@ export default function HeroBanner() {
                     opacity: 0.9,
                     marginBottom: 20
                 }}>
-                    {banners[index].description}
+                    {current?.description}
                 </p>
 
                 <button style={{
@@ -100,7 +117,7 @@ export default function HeroBanner() {
                 </button>
             </div>
 
-            {/* DOT NAV */}
+            {/* DOTS */}
             <div style={{
                 position: "absolute",
                 bottom: 20,
@@ -120,7 +137,7 @@ export default function HeroBanner() {
                             background: i === index ? "#fff" : "#888",
                             cursor: "pointer"
                         }}
-                    ></div>
+                    />
                 ))}
             </div>
 

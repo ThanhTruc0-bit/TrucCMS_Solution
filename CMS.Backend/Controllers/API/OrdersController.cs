@@ -77,7 +77,7 @@ namespace CMS.Backend.Controllers.API
         public IActionResult GetByCustomer(int customerId)
         {
             var orders = _context.Orders
-                .Include(o => o.OrderDetails) // ❗ FIX 2
+                .Include(o => o.OrderDetails) 
                 .Where(o => o.CustomerId == customerId)
                 .Select(o => new
                 {

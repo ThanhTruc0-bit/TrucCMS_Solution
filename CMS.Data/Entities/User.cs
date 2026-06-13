@@ -20,7 +20,7 @@ namespace CMS.Data.Entities
         public string Username { get; set; }
         public string PasswordHash { get; set; }
         public string FullName { get; set; }
-        public string Role { get; set; } // Quản trị viên hoặc Biên tập viên
+        public string Role { get; set; } = "User";
     }
 }
 

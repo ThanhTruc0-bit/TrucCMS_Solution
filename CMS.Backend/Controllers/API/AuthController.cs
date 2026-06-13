@@ -1,20 +1,11 @@
-﻿/*
-Họ Tên: Nguyễn Thị Thanh Trúc
-MSSV: 2123110119
-Lớp: CCQ2311D
-Ngày tạo: 15/05/2026
-Mô tả: Thực thể danh mục 
-*/
-using CMS.Data;
+﻿using CMS.Data;
 using CMS.Data.Entities;
-using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
-using System.Linq;
 
 namespace CMS.Backend.Controllers.API
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/auth")]
     public class AuthController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
@@ -24,67 +15,49 @@ namespace CMS.Backend.Controllers.API
             _context = context;
         }
 
-        // ==========================
-        // ĐĂNG KÝ
-        // ==========================
-        [HttpPost("CustomerRegister")]
-        public IActionResult Register(Customer model)
+        // ================= REGISTER =================
+        [HttpPost("register")]
+        public IActionResult Register([FromBody] User request)
         {
-            // Check email đã tồn tại
-            var exist = _context.Customers
-                .FirstOrDefault(x => x.Email == model.Email);
+            var exists = _context.Users.Any(x => x.Username == request.Username);
 
-            if (exist != null)
+            if (exists)
+                return BadRequest(new { message = "Username đã tồn tại" });
+
+            var user = new User
             {
-                return BadRequest(new
-                {
-                    message = "Email đã tồn tại"
-                });
-            }
+                Username = request.Username,
+                PasswordHash = request.PasswordHash,
+                FullName = request.FullName,
+                Role = "User"
+            };
 
-            _context.Customers.Add(model);
+            _context.Users.Add(user);
             _context.SaveChanges();
 
-            return Ok(new
-            {
-                message = "Đăng ký thành công",
-                customerId = model.Id,
-                user = model
-            });
+            return Ok(new { message = "Đăng ký thành công" });
         }
 
-        // ==========================
-        // ĐĂNG NHẬP (FIX LỖI 400)
-        // ==========================
-        [HttpPost("CustomerLogin")]
-        public IActionResult Login([FromBody] LoginRequest login)
+        [HttpPost("login")]
+        public IActionResult Login([FromBody] User request)
         {
-            if (login == null)
-            {
-                return BadRequest(new
-                {
-                    message = "Dữ liệu không hợp lệ"
-                });
-            }
-
-            var user = _context.Customers
-                .FirstOrDefault(x =>
-                    x.Email == login.Email &&
-                    x.Password == login.Password);
+            var user = _context.Users.FirstOrDefault(x =>
+                x.Username == request.Username &&
+                x.PasswordHash == request.PasswordHash);
 
             if (user == null)
-            {
-                return Unauthorized(new
-                {
-                    message = "Sai email hoặc mật khẩu"
-                });
-            }
+                return BadRequest(new { message = "Sai tài khoản hoặc mật khẩu" });
 
             return Ok(new
             {
                 message = "Đăng nhập thành công",
-                customerId = user.Id,
-                user = user
+                user = new
+                {
+                    user.Id,
+                    user.Username,
+                    user.FullName,
+                    user.Role
+                }
             });
         }
     }

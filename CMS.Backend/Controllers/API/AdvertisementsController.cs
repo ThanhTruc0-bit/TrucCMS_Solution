@@ -38,6 +38,13 @@ namespace CMS.Backend.Controllers.API
         [HttpPost]
         public IActionResult Create(Advertisement model)
         {
+            if (!string.IsNullOrEmpty(model.ImageUrl))
+            {
+                model.ImageUrl = model.ImageUrl
+                    .Replace("//uploads", "/uploads")
+                    .Replace("/uploads/uploads", "/uploads");
+            }
+
             _context.Advertisements.Add(model);
             _context.SaveChanges();
 

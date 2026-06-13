@@ -41,7 +41,12 @@ export default function PostDetail() {
                     <h1 style={styles.heroTitle}>
                         {post.title}
                     </h1>
+
+                    <p style={{ color: "#ddd", marginTop: 10 }}>
+                        Luxury Jewelry • {new Date().toLocaleDateString()}
+                    </p>
                 </div>
+
             </div>
 
             {/* CONTENT */}
@@ -62,13 +67,13 @@ export default function PostDetail() {
 /* ================= STYLE ================= */
 const styles = {
     page: {
-        fontFamily: "serif",
-        backgroundColor: "#fafafa"
+        fontFamily: "'Playfair Display', serif",
+        backgroundColor: "#f8f8f8"
     },
 
     hero: {
         position: "relative",
-        height: "400px",
+        height: "420px",
         overflow: "hidden"
     },
 
@@ -76,25 +81,24 @@ const styles = {
         width: "100%",
         height: "100%",
         objectFit: "cover",
-        filter: "brightness(70%)"
+        filter: "brightness(65%)"
     },
 
     overlay: {
         position: "absolute",
-        top: 0,
-        left: 0,
-        width: "100%",
-        height: "100%",
+        inset: 0,
         display: "flex",
+        flexDirection: "column",
         alignItems: "center",
-        justifyContent: "center"
+        justifyContent: "center",
+        textAlign: "center"
     },
 
     heroTitle: {
         color: "#fff",
-        fontSize: "38px",
-        letterSpacing: "2px",
-        textAlign: "center",
+        fontSize: "42px",
+        letterSpacing: "3px",
+        fontWeight: "500",
         maxWidth: "800px"
     },
 
@@ -102,14 +106,14 @@ const styles = {
         maxWidth: "900px",
         margin: "60px auto",
         backgroundColor: "#fff",
-        padding: "40px",
-        borderRadius: "10px",
-        boxShadow: "0 10px 30px rgba(0,0,0,0.05)"
+        padding: "50px",
+        borderRadius: "12px",
+        boxShadow: "0 15px 40px rgba(0,0,0,0.06)"
     },
 
     content: {
-        fontSize: "16px",
-        lineHeight: "1.8",
+        fontSize: "17px",
+        lineHeight: "1.9",
         color: "#333"
     }
 };

@@ -3,60 +3,48 @@ import { useNavigate, Link } from "react-router-dom";
 
 const BASE = "https://localhost:7194";
 
-export default function Login() {
+export default function Register() {
     const navigate = useNavigate();
 
     const [form, setForm] = useState({
         username: "",
+        fullName: "",
         passwordHash: ""
     });
 
     const handleChange = (e) => {
-        const { name, value } = e.target;
-        setForm(prev => ({
-            ...prev,
-            [name]: value
-        }));
+        setForm({
+            ...form,
+            [e.target.name]: e.target.value
+        });
     };
 
-    const handleLogin = async () => {
-        if (!form.username || !form.passwordHash) {
+    const handleRegister = async () => {
+        if (!form.username || !form.fullName || !form.passwordHash) {
             alert("Vui lòng nhập đầy đủ thông tin");
             return;
         }
 
         try {
-            const res = await fetch(`${BASE}/api/auth/login`, {
+            const res = await fetch(`${BASE}/api/auth/register`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify({
-                    username: form.username.trim(),
-                    passwordHash: form.passwordHash
-                })
+                body: JSON.stringify(form)
             });
 
-           
-            const text = await res.text();
-            let data = null;
-
-            try {
-                data = text ? JSON.parse(text) : {};
-            } catch (err) {
-                console.log("Response không phải JSON:", text);
-            }
+            const data = await res.json();
 
             if (res.ok) {
-                localStorage.setItem("user", JSON.stringify(data.user));
-                alert("Đăng nhập thành công ");
-                navigate("/");
+                alert("Đăng ký thành công ✨");
+                navigate("/login");
             } else {
-                alert(data?.message || "Sai tài khoản hoặc mật khẩu");
+                alert(data.message || "Đăng ký thất bại");
             }
 
         } catch (err) {
-            console.log("Login error:", err);
+            console.log(err);
             alert("Lỗi server");
         }
     };
@@ -65,13 +53,19 @@ export default function Login() {
         <div style={styles.page}>
             <div style={styles.card}>
 
-                <h1 style={styles.title}>WELCOME BACK</h1>
-                <p style={styles.sub}>Đăng nhập vào hệ thống</p>
+                <h1 style={styles.title}>CREATE ACCOUNT</h1>
+                <p style={styles.sub}>Đăng ký tài khoản khách hàng</p>
 
                 <input
                     name="username"
                     placeholder="Username"
-                    value={form.username}
+                    onChange={handleChange}
+                    style={styles.input}
+                />
+
+                <input
+                    name="fullName"
+                    placeholder="Họ và tên"
                     onChange={handleChange}
                     style={styles.input}
                 />
@@ -80,19 +74,18 @@ export default function Login() {
                     name="passwordHash"
                     type="password"
                     placeholder="Mật khẩu"
-                    value={form.passwordHash}
                     onChange={handleChange}
                     style={styles.input}
                 />
 
-                <button onClick={handleLogin} style={styles.button}>
-                    Đăng nhập
+                <button onClick={handleRegister} style={styles.button}>
+                    Đăng ký
                 </button>
 
                 <p style={styles.bottomText}>
-                    Chưa có tài khoản?{" "}
-                    <Link to="/register" style={styles.link}>
-                        Đăng ký
+                    Đã có tài khoản?{" "}
+                    <Link to="/login" style={styles.link}>
+                        Đăng nhập
                     </Link>
                 </p>
 
