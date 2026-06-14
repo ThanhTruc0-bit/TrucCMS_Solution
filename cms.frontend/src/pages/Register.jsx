@@ -9,7 +9,10 @@ export default function Register() {
     const [form, setForm] = useState({
         username: "",
         fullName: "",
-        passwordHash: ""
+        passwordHash: "",
+        email: "",
+        phone: "",
+        address: ""
     });
 
     const handleChange = (e) => {
@@ -74,6 +77,27 @@ export default function Register() {
                     name="passwordHash"
                     type="password"
                     placeholder="Mật khẩu"
+                    onChange={handleChange}
+                    style={styles.input}
+                />
+
+                <input
+                    name="email"
+                    placeholder="Email"
+                    onChange={handleChange}
+                    style={styles.input}
+                />
+
+                <input
+                    name="phone"
+                    placeholder="SĐT"
+                    onChange={handleChange}
+                    style={styles.input}
+                />
+
+                <input
+                    name="address"
+                    placeholder="Địa chỉ"
                     onChange={handleChange}
                     style={styles.input}
                 />

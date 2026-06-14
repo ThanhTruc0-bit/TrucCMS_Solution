@@ -1,11 +1,12 @@
-﻿using CMS.Data;
+﻿using CMS.Backend.Services;
+using CMS.Data;
 using Grpc.AspNetCore;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
-using System.Text.Json.Serialization;
 using Microsoft.Extensions.FileProviders;
+using System.Text.Json.Serialization;
 
 var provider = new FileExtensionContentTypeProvider();
 provider.Mappings[".avif"] = "image/avif";
@@ -43,6 +44,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+//mail
+builder.Services.AddScoped<EmailService>();
 // Grpc
 builder.Services.AddGrpc();
 
@@ -77,14 +80,21 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseStaticFiles();
+//app.UseStaticFiles();
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    ContentTypeProvider = provider
+});
 
 app.UseStaticFiles(new StaticFileOptions
 {
     FileProvider = new PhysicalFileProvider(
         Path.Combine(builder.Environment.WebRootPath, "uploads")),
-    RequestPath = "/uploads"
+    RequestPath = "/uploads",
+    ContentTypeProvider = provider
 });
+
 app.UseRouting();
 
 // 2. Kích hoạt chính sách CORS đã khai báo ở trên

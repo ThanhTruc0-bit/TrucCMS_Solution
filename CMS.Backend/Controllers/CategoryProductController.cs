@@ -1,15 +1,7 @@
-﻿/*
-Họ Tên: Nguyễn Thị Thanh Trúc
-MSSV: 2123110119
-Lớp: CCQ2311D
-Ngày tạo: 15/05/2026
-Mô tả: Thực thể danh mục 
- */
-using CMS.Data;
+﻿using CMS.Data;
 using CMS.Data.Entities;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
-using System.Linq;
+using Microsoft.AspNetCore.Mvc;
 
 namespace CMS.Backend.Controllers
 {
@@ -17,18 +9,22 @@ namespace CMS.Backend.Controllers
     public class CategoryProductController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly IWebHostEnvironment _env;
 
-        public CategoryProductController(ApplicationDbContext context)
+        public CategoryProductController(ApplicationDbContext context, IWebHostEnvironment env)
         {
             _context = context;
+            _env = env;
         }
 
+        // LIST
         public IActionResult Index()
         {
             var data = _context.CategoriesProducts.ToList();
             return View(data);
         }
 
+        // DETAILS
         public IActionResult Details(int id)
         {
             var item = _context.CategoriesProducts.Find(id);
@@ -37,25 +33,42 @@ namespace CMS.Backend.Controllers
             return View(item);
         }
 
+        // CREATE GET
         [HttpGet]
         public IActionResult Create()
         {
             return View();
         }
 
+        // CREATE POST
         [HttpPost]
-        public IActionResult Create(CategoryProduct model)
+        public IActionResult Create(CategoryProduct model, IFormFile imageFile)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid) return View(model);
+
+            if (imageFile != null)
             {
-                _context.CategoriesProducts.Add(model);
-                _context.SaveChanges();
-                return RedirectToAction(nameof(Index));
+                var fileName = Guid.NewGuid() + Path.GetExtension(imageFile.FileName);
+                var folder = Path.Combine(_env.WebRootPath, "uploads/categories");
+                Directory.CreateDirectory(folder);
+
+                var filePath = Path.Combine(folder, fileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    imageFile.CopyTo(stream);
+                }
+
+                model.ImageUrl = "/uploads/categories/" + fileName;
             }
 
-            return View(model);
+            _context.CategoriesProducts.Add(model);
+            _context.SaveChanges();
+
+            return RedirectToAction(nameof(Index));
         }
 
+        // EDIT GET
         [HttpGet]
         public IActionResult Edit(int id)
         {
@@ -65,19 +78,40 @@ namespace CMS.Backend.Controllers
             return View(item);
         }
 
+        // EDIT POST
         [HttpPost]
-        public IActionResult Edit(CategoryProduct model)
+        public IActionResult Edit(CategoryProduct model, IFormFile imageFile)
         {
-            if (ModelState.IsValid)
+            var item = _context.CategoriesProducts.Find(model.Id);
+            if (item == null) return NotFound();
+
+            if (!ModelState.IsValid) return View(model);
+
+            item.Name = model.Name;
+            item.Description = model.Description;
+
+            if (imageFile != null)
             {
-                _context.CategoriesProducts.Update(model);
-                _context.SaveChanges();
-                return RedirectToAction(nameof(Index));
+                var fileName = Guid.NewGuid() + Path.GetExtension(imageFile.FileName);
+                var folder = Path.Combine(_env.WebRootPath, "uploads/categories");
+                Directory.CreateDirectory(folder);
+
+                var filePath = Path.Combine(folder, fileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    imageFile.CopyTo(stream);
+                }
+
+                item.ImageUrl = "/uploads/categories/" + fileName;
             }
 
-            return View(model);
+            _context.SaveChanges();
+
+            return RedirectToAction(nameof(Index));
         }
 
+        // DELETE
         public IActionResult Delete(int id)
         {
             var item = _context.CategoriesProducts.Find(id);

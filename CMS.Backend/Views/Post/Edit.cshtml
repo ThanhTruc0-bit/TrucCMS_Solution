@@ -10,12 +10,10 @@
     <div class="card shadow">
 
         <div class="card-header bg-warning text-dark">
-
             <h4 class="mb-0">
                 <i class="bi bi-pencil-square"></i>
                 CHỈNH SỬA BÀI VIẾT
             </h4>
-
         </div>
 
         <div class="card-body">
@@ -24,16 +22,13 @@
                   method="post"
                   enctype="multipart/form-data">
 
-                <!-- Id ẩn -->
                 <input asp-for="Id" type="hidden" />
 
                 <div class="row">
 
-                    <!-- Nội dung bên trái -->
                     <div class="col-md-8">
 
                         <div class="mb-3">
-
                             <label class="form-label fw-bold">
                                 Tiêu đề bài viết:
                             </label>
@@ -41,29 +36,25 @@
                             <input asp-for="Title"
                                    class="form-control"
                                    placeholder="Nhập tiêu đề..." />
-
                         </div>
 
                         <div class="mb-3">
-
                             <label class="form-label fw-bold">
                                 Nội dung chi tiết:
                             </label>
 
                             <textarea asp-for="Content"
+                                      id="Content"
                                       class="form-control"
                                       rows="10"
                                       placeholder="Viết nội dung tại đây..."></textarea>
-
                         </div>
 
                     </div>
 
-                    <!-- Nội dung bên phải -->
                     <div class="col-md-4">
 
                         <div class="mb-3">
-
                             <label class="form-label fw-bold">
                                 Chuyên mục:
                             </label>
@@ -71,31 +62,22 @@
                             <select asp-for="CategoryId"
                                     class="form-select"
                                     asp-items="ViewBag.CategoryList">
-
-                                <option value="">
-                                    -- Chọn danh mục --
-                                </option>
-
+                                <option value="">-- Chọn danh mục --</option>
                             </select>
-
                         </div>
 
                         <div class="mb-3">
-
                             <label class="form-label fw-bold">
                                 Ảnh hiện tại:
                             </label>
-
                             <br />
 
                             <img src="@Model.ImageUrl"
                                  width="250"
                                  class="img-thumbnail" />
-
                         </div>
 
                         <div class="mb-3">
-
                             <label class="form-label fw-bold">
                                 Chọn ảnh mới:
                             </label>
@@ -103,12 +85,11 @@
                             <input type="file"
                                    name="uploadImage"
                                    class="form-control" />
-
                         </div>
+
                         <input asp-for="ImageUrl" type="hidden" />
 
                         <div class="mb-3">
-
                             <label class="form-label fw-bold">
                                 Ngày đăng:
                             </label>
@@ -116,7 +97,6 @@
                             <input asp-for="CreatedDate"
                                    type="date"
                                    class="form-control" />
-
                         </div>
 
                         <hr />
@@ -125,18 +105,14 @@
 
                             <button type="submit"
                                     class="btn btn-warning">
-
                                 <i class="bi bi-save"></i>
                                 Cập nhật bài viết
-
                             </button>
 
                             <a asp-action="Index"
                                class="btn btn-secondary">
-
                                 <i class="bi bi-arrow-left"></i>
                                 Quay lại danh sách
-
                             </a>
 
                         </div>
@@ -152,3 +128,23 @@
     </div>
 
 </div>
+
+<!-- ✅ ĐẶT NGOÀI -->
+@section Scripts {
+
+    <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
+
+    <script>
+
+           ClassicEditor
+        .create(document.querySelector('#Content'), {
+            ckfinder: {
+                uploadUrl: 'https://localhost:7194/api/upload'
+            }
+        })
+        .catch(error => {
+            console.error(error);
+        });
+    </script>
+
+}

@@ -12,61 +12,47 @@ export default function Login() {
     });
 
     const handleChange = (e) => {
-        const { name, value } = e.target;
         setForm(prev => ({
             ...prev,
-            [name]: value
+            [e.target.name]: e.target.value
         }));
     };
 
     const handleLogin = async () => {
         if (!form.username || !form.passwordHash) {
-            alert("Vui lòng nhập đầy đủ thông tin");
+            alert("Thiếu thông tin");
             return;
         }
 
-        try {
-            const res = await fetch(`${BASE}/api/auth/login`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    username: form.username.trim(),
-                    passwordHash: form.passwordHash
-                })
-            });
+        const res = await fetch(`${BASE}/api/auth/login`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                username: form.username.trim(),
+                passwordHash: form.passwordHash.trim()
+            })
+        });
 
-           
-            const text = await res.text();
-            let data = null;
+        const data = await res.json();
 
-            try {
-                data = text ? JSON.parse(text) : {};
-            } catch (err) {
-                console.log("Response không phải JSON:", text);
-            }
-
-            if (res.ok) {
-                localStorage.setItem("user", JSON.stringify(data.user));
-                alert("Đăng nhập thành công ");
-                navigate("/");
-            } else {
-                alert(data?.message || "Sai tài khoản hoặc mật khẩu");
-            }
-
-        } catch (err) {
-            console.log("Login error:", err);
-            alert("Lỗi server");
+        if (!res.ok) {
+            alert(data.message || "Đăng nhập thất bại");
+            return;
         }
+
+     
+        localStorage.setItem("user", JSON.stringify({
+            ...data.user,
+            customerId: data.customerId
+        }));
+
+        navigate("/");
     };
 
     return (
         <div style={styles.page}>
             <div style={styles.card}>
-
-                <h1 style={styles.title}>WELCOME BACK</h1>
-                <p style={styles.sub}>Đăng nhập vào hệ thống</p>
+                <h2 style={styles.title}>LOGIN</h2>
 
                 <input
                     name="username"
@@ -79,7 +65,7 @@ export default function Login() {
                 <input
                     name="passwordHash"
                     type="password"
-                    placeholder="Mật khẩu"
+                    placeholder="Password"
                     value={form.passwordHash}
                     onChange={handleChange}
                     style={styles.input}
@@ -89,13 +75,9 @@ export default function Login() {
                     Đăng nhập
                 </button>
 
-                <p style={styles.bottomText}>
-                    Chưa có tài khoản?{" "}
-                    <Link to="/register" style={styles.link}>
-                        Đăng ký
-                    </Link>
+                <p style={styles.text}>
+                    Chưa có tài khoản? <Link to="/register">Đăng ký</Link>
                 </p>
-
             </div>
         </div>
     );
@@ -107,64 +89,41 @@ const styles = {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        background: "linear-gradient(135deg, #111, #222)"
+        background: "#111"
     },
-
     card: {
-        width: 420,
-        padding: 40,
-        borderRadius: 16,
-        background: "rgba(255,255,255,0.08)",
-        backdropFilter: "blur(15px)",
-        boxShadow: "0 20px 60px rgba(0,0,0,0.5)",
+        width: 380,
+        padding: 30,
+        borderRadius: 12,
+        background: "#1c1c1c",
         color: "#fff",
         textAlign: "center"
     },
-
     title: {
-        marginBottom: 5,
-        letterSpacing: 2,
-        fontSize: 26,
+        marginBottom: 20,
         color: "#d6b25e"
     },
-
-    sub: {
-        marginBottom: 25,
-        fontSize: 13,
-        color: "#bbb"
-    },
-
     input: {
         width: "100%",
         padding: 12,
-        marginBottom: 12,
-        borderRadius: 10,
-        border: "1px solid rgba(255,255,255,0.2)",
-        background: "rgba(0,0,0,0.3)",
-        color: "#fff",
-        outline: "none"
+        marginBottom: 10,
+        borderRadius: 8,
+        border: "1px solid #333",
+        background: "#000",
+        color: "#fff"
     },
-
     button: {
         width: "100%",
         padding: 12,
-        borderRadius: 10,
-        border: "none",
         background: "#d6b25e",
-        color: "#111",
-        fontWeight: "bold",
+        border: "none",
+        borderRadius: 8,
         cursor: "pointer",
-        marginTop: 10
+        fontWeight: "bold"
     },
-
-    bottomText: {
-        marginTop: 15,
+    text: {
+        marginTop: 10,
         fontSize: 13,
-        color: "#ccc"
-    },
-
-    link: {
-        color: "#d6b25e",
-        textDecoration: "none"
+        color: "#aaa"
     }
 };

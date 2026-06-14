@@ -4,6 +4,8 @@ import CategoryMenu from "../components/CategoryMenu";
 import ProductGrid from "../components/ProductGrid"; 
 import BlogSection from "../components/BlogSection";
 import Footer from "../components/Footer";
+import LatestProducts from "../components/LatestProducts";
+import HotProducts from "../components/HotProducts";
 
 export default function Home() {
     return (
@@ -14,6 +16,11 @@ export default function Home() {
             <HeroBanner />
 
             <CategoryMenu />
+
+
+
+            <HotProducts />
+            <LatestProducts />
 
             {/* ✅ SẢN PHẨM */}
             <ProductGrid />

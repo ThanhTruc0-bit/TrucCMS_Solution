@@ -23,9 +23,6 @@ namespace CMS.Backend.Controllers.API
             _context = context;
         }
 
-        // =========================
-        // GET ALL
-        // =========================
         [HttpGet]
         public IActionResult GetAll()
         {
@@ -35,6 +32,7 @@ namespace CMS.Backend.Controllers.API
                 {
                     p.Id,
                     p.Title,
+                    Content = p.Content ?? "",   // ✅ FIX
                     p.ImageUrl,
                     p.CategoryId,
                     CreatedAt = p.CreatedDate
@@ -44,9 +42,6 @@ namespace CMS.Backend.Controllers.API
             return Ok(posts);
         }
 
-        // =========================
-        // GET BY ID
-        // =========================
         [HttpGet("{id}")]
         public IActionResult GetDetail(int id)
         {
@@ -61,20 +56,18 @@ namespace CMS.Backend.Controllers.API
             {
                 post.Id,
                 post.Title,
-                post.Content,
+                Content = post.Content ?? "",   // ✅ FIX
                 post.ImageUrl,
                 post.CategoryId,
-                CategoryName = post.Category.Name,
+                CategoryName = post.Category?.Name,
                 post.CreatedDate
             });
         }
 
-        // =========================
-        // POST
-        // =========================
         [HttpPost]
         public IActionResult Create(Post model)
         {
+            model.Content = model.Content ?? "";   // ✅ FIX
             model.CreatedDate = DateTime.Now;
 
             _context.Posts.Add(model);
@@ -83,9 +76,6 @@ namespace CMS.Backend.Controllers.API
             return Ok(model);
         }
 
-        // =========================
-        // PUT
-        // =========================
         [HttpPut("{id}")]
         public IActionResult Update(int id, Post model)
         {
@@ -95,7 +85,7 @@ namespace CMS.Backend.Controllers.API
                 return NotFound();
 
             post.Title = model.Title;
-            post.Content = model.Content;
+            post.Content = model.Content ?? "";   // ✅ FIX
             post.ImageUrl = model.ImageUrl;
             post.CategoryId = model.CategoryId;
 
@@ -104,9 +94,6 @@ namespace CMS.Backend.Controllers.API
             return Ok(post);
         }
 
-        // =========================
-        // DELETE
-        // =========================
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
@@ -120,6 +107,7 @@ namespace CMS.Backend.Controllers.API
 
             return Ok(new { message = "Deleted successfully" });
         }
+
         [HttpGet("paging")]
         public IActionResult GetPaging(int page = 1, int pageSize = 10)
         {
@@ -131,7 +119,7 @@ namespace CMS.Backend.Controllers.API
                 {
                     p.Id,
                     p.Title,
-                    p.Content, 
+                    Content = p.Content ?? "",   // ✅ FIX
                     p.ImageUrl,
                     p.CategoryId,
                     p.CreatedDate

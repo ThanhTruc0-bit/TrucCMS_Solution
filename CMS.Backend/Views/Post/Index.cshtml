@@ -6,16 +6,19 @@
 
 <div class="container mt-4">
 
-    <!-- HEADER -->
     <div class="d-flex justify-content-between align-items-center mb-3">
 
         <h2 class="fw-bold text-danger">
             📰 DANH SÁCH BÀI VIẾT
         </h2>
 
+        <a asp-action="Create" class="btn btn-success shadow-sm">
+            <i class="bi bi-plus-circle"></i>
+            Thêm bài viết
+        </a>
+
     </div>
 
-    <!-- GRID -->
     <div class="row">
 
         @if (Model != null && Model.Any())
@@ -26,7 +29,6 @@
 
                     <div class="card shadow-sm border-0 h-100">
 
-                        <!-- IMAGE -->
                         <img src="@item.ImageUrl"
                              class="card-img-top"
                              style="height:200px; object-fit:cover;"
@@ -34,27 +36,30 @@
 
                         <div class="card-body d-flex flex-column">
 
-                            <!-- CATEGORY -->
                             <span class="badge bg-info text-dark mb-2 w-fit">
                                 @item.Category?.Name
                             </span>
 
-                            <!-- TITLE -->
                             <h5 class="fw-bold text-primary">
                                 @item.Title
                             </h5>
 
-                            <!-- CONTENT -->
+                            <!-- ✅ FIX ONLY HERE -->
                             <p class="text-muted small flex-grow-1">
-                                @item.Content
+                                @{
+                                    var content = item.Content?.ToString() ?? "";
+                                    var shortContent = content.Length > 150
+                                    ? content.Substring(0, 150) + "..."
+                                    : content;
+                                }
+
+                                @Html.Raw(shortContent)
                             </p>
 
-                            <!-- DATE -->
                             <p class="text-secondary small mb-2">
                                 📅 @item.CreatedDate.ToString("dd/MM/yyyy")
                             </p>
 
-                            <!-- BUTTONS -->
                             <div class="d-flex justify-content-between">
 
                                 <a href="/Post/Details/@item.Id"

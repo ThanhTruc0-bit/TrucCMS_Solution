@@ -8,30 +8,23 @@
 
     <h2>Cập nhật danh mục</h2>
 
-    <form asp-action="Edit" method="post">
+    <form asp-action="Edit" method="post" enctype="multipart/form-data">
 
         <input asp-for="Id" type="hidden" />
 
-        <div class="mb-3">
-            <label>Tên danh mục</label>
-            <input asp-for="Name" class="form-control" />
-        </div>
+        <input asp-for="Name" class="form-control mb-2" />
 
-        <div class="mb-3">
-            <label>Mô tả</label>
-            <textarea asp-for="Description"
-                      class="form-control"></textarea>
-        </div>
+        <textarea asp-for="Description" class="form-control mb-2"></textarea>
 
-        <button type="submit"
-                class="btn btn-warning">
-            Cập nhật
-        </button>
+        @if (!string.IsNullOrEmpty(Model.ImageUrl))
+        {
+            <img src="@Model.ImageUrl"
+                 style="width:80px;height:80px;object-fit:cover;border-radius:8px;" />
+        }
 
-        <a asp-action="Index"
-           class="btn btn-secondary">
-            Quay lại
-        </a>
+        <input type="file" name="imageFile" class="form-control mt-2" />
+
+        <button class="btn btn-warning mt-3">Cập nhật</button>
 
     </form>
 

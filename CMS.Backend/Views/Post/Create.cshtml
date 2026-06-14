@@ -132,10 +132,16 @@
     <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
 
     <script>
-        ClassicEditor
-            .create(document.querySelector('#Content'))
-            .catch(error => {
-                console.error(error);
-            });
+     
+           ClassicEditor
+        .create(document.querySelector('#Content'), {
+            ckfinder: {
+                uploadUrl: 'https://localhost:7194/api/upload'
+            }
+        })
+        .catch(error => {
+            console.error(error);
+        });
+           
     </script>
 }

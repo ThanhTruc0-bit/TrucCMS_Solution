@@ -29,7 +29,8 @@ namespace CMS.Backend.Controllers.API
             var data = _context.CategoriesProducts.Select(x => new {
                 x.Id,
                 x.Name,
-                x.Description
+                x.Description,
+                x.ImageUrl
             }).ToList();
 
             return Ok(data);

@@ -7,6 +7,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<PackageReference Include="BCrypt.Net-Next" Version="4.2.0" />
 		<PackageReference Include="Grpc.Tools" Version="2.80.0">
 			<PrivateAssets>all</PrivateAssets>
 		</PackageReference>

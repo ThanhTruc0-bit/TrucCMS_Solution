@@ -144,11 +144,55 @@ namespace CMS.Backend.Controllers.API
         [HttpGet("paging")]
         public IActionResult GetPaging(int page = 1, int pageSize = 10)
         {
+            var total = _context.Products.Count();
+
             var data = _context.Products
-                .Include(p => p.CategoryProduct)
                 .OrderByDescending(p => p.Id)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
+                .ToList();
+
+            return Ok(new
+            {
+                total,
+                data
+            });
+        }
+        [HttpGet("search")]
+        public IActionResult Search(string keyword)
+        {
+            var data = _context.Products
+                .Where(x => x.Name.Contains(keyword ?? ""))
+                .ToList();
+
+            return Ok(data);
+        }
+        [HttpGet("latest")]
+        public IActionResult GetLatest()
+        {
+            var data = _context.Products
+                .OrderByDescending(x => x.Id) 
+                .Take(3)
+                .Select(p => new
+                {
+                    p.Id,
+                    p.Name,
+                    p.Price,
+                    p.ImageUrl,
+                    p.StockQuantity,
+                    p.CategoryProductId,
+                    CategoryName = p.CategoryProduct != null ? p.CategoryProduct.Name : ""
+                })
+                .ToList();
+
+            return Ok(data);
+        }
+        [HttpGet("hot")]
+        public IActionResult GetHotProducts()
+        {
+            var data = _context.Products
+                .OrderByDescending(x => x.SoldQuantity) // hoặc OrderCount
+                .Take(3)
                 .Select(p => new
                 {
                     p.Id,
@@ -162,14 +206,65 @@ namespace CMS.Backend.Controllers.API
 
             return Ok(data);
         }
-        [HttpGet("search")]
-        public IActionResult Search(string keyword)
+        [HttpGet("shop")]
+        public IActionResult Shop(
+int page = 1,
+int pageSize = 8,
+int? categoryId = null,
+string? sort = null,
+decimal? minPrice = null,
+decimal? maxPrice = null)
         {
-            var data = _context.Products
-                .Where(x => x.Name.Contains(keyword))
+            var query = _context.Products
+                .Include(x => x.CategoryProduct)
+                .AsQueryable();
+
+            // FILTER theo category
+            if (categoryId.HasValue)
+            {
+                query = query.Where(x => x.CategoryProductId == categoryId);
+            }
+            if (minPrice.HasValue)
+            {
+                query = query.Where(x => x.Price >= minPrice.Value);
+            }
+
+            if (maxPrice.HasValue)
+            {
+                query = query.Where(x => x.Price <= maxPrice.Value);
+            }
+            // SORT
+            query = sort switch
+            {
+                "price_asc" => query.OrderBy(x => x.Price),
+                "price_desc" => query.OrderByDescending(x => x.Price),
+                "newest" => query.OrderByDescending(x => x.Id),
+                "best" => query.OrderByDescending(x => x.SoldQuantity),
+                _ => query.OrderByDescending(x => x.Id)
+            };
+
+            var total = query.Count();
+
+            var data = query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .Select(p => new
+                {
+                    p.Id,
+                    p.Name,
+                    p.Price,
+                    p.ImageUrl,
+                    p.SoldQuantity,
+                    p.CategoryProductId,
+                    CategoryName = p.CategoryProduct.Name
+                })
                 .ToList();
 
-            return Ok(data);
+            return Ok(new
+            {
+                total,
+                data
+            });
         }
     }
 }

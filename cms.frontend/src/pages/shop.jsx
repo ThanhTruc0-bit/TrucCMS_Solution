@@ -1,5 +1,5 @@
 ﻿import { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, Link } from "react-router-dom";
 
 const BASE = "https://localhost:7194";
 
@@ -8,61 +8,105 @@ export default function Shop() {
     const navigate = useNavigate();
 
     const query = new URLSearchParams(location.search);
-    const keyword = query.get("keyword") || "";
+
+    const page = parseInt(query.get("page")) || 1;
+    const categoryId = query.get("categoryId");
+    const sort = query.get("sort");
 
     const [products, setProducts] = useState([]);
-    const [loading, setLoading] = useState(false);
+
+    const [minPriceInput, setMinPriceInput] = useState("");
+    const [maxPriceInput, setMaxPriceInput] = useState("");
+
+    const [minPrice, setMinPrice] = useState("");
+    const [maxPrice, setMaxPrice] = useState("");
+
+    // debounce min/max
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setMinPrice(minPriceInput);
+            setMaxPrice(maxPriceInput);
+        }, 400);
+
+        return () => clearTimeout(timer);
+    }, [minPriceInput, maxPriceInput]);
 
     useEffect(() => {
         fetchProducts();
-    }, [keyword]);
+    }, [page, categoryId, sort, minPrice, maxPrice]);
 
     const fetchProducts = async () => {
-        setLoading(true);
+        let url = `${BASE}/api/products/shop?page=${page}&pageSize=8`;
 
-        try {
-            const url = keyword
-                ? `${BASE}/api/products/search?keyword=${keyword}`
-                : `${BASE}/api/products`;
+        if (categoryId) url += `&categoryId=${categoryId}`;
+        if (sort) url += `&sort=${sort}`;
 
-            const res = await fetch(url);
-            const data = await res.json();
+        // FIX QUAN TRỌNG
+        if (minPrice !== "") url += `&minPrice=${minPrice}`;
+        if (maxPrice !== "") url += `&maxPrice=${maxPrice}`;
 
-            setProducts(data);
-        } catch (err) {
-            console.error(err);
+        const res = await fetch(url);
+
+        if (!res.ok) {
+            console.log("API ERROR:", await res.text());
+            return;
         }
+        const data = await res.json();
 
-        setLoading(false);
+        setProducts(Array.isArray(data.data) ? data.data : []);
     };
 
-    const highlightText = (text, keyword) => {
-        if (!keyword) return text;
-
-        const parts = text.split(new RegExp(`(${keyword})`, "gi"));
-
-        return parts.map((part, i) =>
-            part.toLowerCase() === keyword.toLowerCase() ? (
-                <span key={i} style={styles.highlight}>
-                    {part}
-                </span>
-            ) : (
-                part
-            )
-        );
+    const changePage = (newPage) => {
+        const params = new URLSearchParams(location.search);
+        params.set("page", newPage);
+        navigate(`/shop?${params.toString()}`);
     };
 
     return (
         <div style={styles.page}>
 
-            {/* HEADER TITLE */}
+            {/* HEADER */}
             <div style={styles.header}>
-                <h1>CỬA HÀNG</h1>
-                {keyword && <p>Kết quả cho: <b>{keyword}</b></p>}
-            </div>
+                <Link to="/" style={styles.backBtn}>
+                    ← Home
+                </Link>
 
-            {/* LOADING */}
-            {loading && <p>Đang tải sản phẩm...</p>}
+                <div style={styles.rightBox}>
+
+                    <select
+                        style={styles.select}
+                        onChange={(e) => {
+                            const params = new URLSearchParams(location.search);
+                            params.set("sort", e.target.value);
+                            params.set("page", 1);
+                            navigate(`/shop?${params.toString()}`);
+                        }}
+                    >
+                        <option value="">Mặc định</option>
+                        <option value="newest">Mới nhất</option>
+                        <option value="price_asc">Giá tăng</option>
+                        <option value="price_desc">Giá giảm</option>
+                        <option value="best">Bán chạy</option>
+                    </select>
+
+                    {/* MIN PRICE */}
+                    <input
+                        placeholder="Min"
+                        value={minPriceInput}
+                        onChange={(e) => setMinPriceInput(e.target.value)}
+                        style={styles.input}
+                    />
+
+                    {/* MAX PRICE */}
+                    <input
+                        placeholder="Max"
+                        value={maxPriceInput}
+                        onChange={(e) => setMaxPriceInput(e.target.value)}
+                        style={styles.input}
+                    />
+
+                </div>
+            </div>
 
             {/* GRID */}
             <div style={styles.grid}>
@@ -72,98 +116,134 @@ export default function Shop() {
                         style={styles.card}
                         onClick={() => navigate(`/product/${p.id}`)}
                     >
+                        <img
+                            src={BASE + p.imageUrl}
+                            style={styles.img}
+                            alt=""
+                        />
 
-                        <div style={styles.imgBox}>
-                            <img
-                                src={BASE + p.imageUrl}
-                                style={styles.img}
-                            />
+                        <div style={styles.info}>
+                            <div style={styles.name}>{p.name}</div>
+                            <div style={styles.price}>
+                                {p.price.toLocaleString()} ₫
+                            </div>
+                            <div style={styles.sold}>
+                                Đã bán {p.soldQuantity || 0}
+                            </div>
                         </div>
 
-                        <h3 style={styles.name}>
-                            {highlightText(p.name, keyword)}
-                        </h3>
-
-                        <p style={styles.price}>
-                            {p.price.toLocaleString()} đ
-                        </p>
-
-                        <button style={styles.btn}>
-                            Xem chi tiết
-                        </button>
-
+                        {p.soldQuantity > 5 && (
+                            <div style={styles.hot}>HOT</div>
+                        )}
                     </div>
                 ))}
+            </div>
+
+            {/* PAGINATION */}
+            <div style={styles.pagination}>
+                <button
+                    disabled={page <= 1}
+                    onClick={() => changePage(page - 1)}
+                >
+                    ←
+                </button>
+
+                <div>Trang {page}</div>
+
+                <button onClick={() => changePage(page + 1)}>
+                    →
+                </button>
             </div>
 
         </div>
     );
 }
+
+/* STYLE GIỮ NGUYÊN */
 const styles = {
     page: {
-        padding: "80px 10%",
-        fontFamily: "serif",
-        background: "#fafafa"
+        padding: "50px 8%",
+        background: "#f7f6f4",
+        fontFamily: "serif"
     },
-
     header: {
-        textAlign: "center",
-        marginBottom: 40
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        marginBottom: 30
     },
-
+    backBtn: {
+        textDecoration: "none",
+        padding: "10px 18px",
+        borderRadius: 999,
+        border: "1px solid #111",
+        color: "#111",
+        background: "#fff"
+    },
+    rightBox: {
+        display: "flex",
+        gap: 10,
+        alignItems: "center"
+    },
+    select: {
+        padding: "8px 12px",
+        borderRadius: 10,
+        border: "1px solid #ddd"
+    },
+    input: {
+        width: 80,
+        padding: "8px",
+        borderRadius: 10,
+        border: "1px solid #ddd"
+    },
     grid: {
         display: "grid",
         gridTemplateColumns: "repeat(4, 1fr)",
-        gap: 25
+        gap: 22
     },
-
     card: {
         background: "#fff",
-        borderRadius: 14,
-        padding: 15,
-        boxShadow: "0 10px 30px rgba(0,0,0,0.05)",
-        cursor: "pointer",
-        transition: "0.3s",
-    },
-
-    imgBox: {
+        borderRadius: 18,
         overflow: "hidden",
-        borderRadius: 10
+        cursor: "pointer",
+        boxShadow: "0 10px 25px rgba(0,0,0,0.06)"
     },
-
     img: {
         width: "100%",
-        height: 200,
-        objectFit: "cover",
-        transition: "0.4s"
+        height: 230,
+        objectFit: "cover"
     },
-
+    info: {
+        padding: 14
+    },
     name: {
-        fontSize: 16,
-        marginTop: 10
+        fontSize: 14,
+        fontWeight: 600
     },
-
     price: {
+        marginTop: 6,
         color: "#bfa14a",
-        fontWeight: "bold",
-        marginTop: 5
+        fontWeight: "bold"
     },
-
-    btn: {
-        marginTop: 10,
-        width: "100%",
-        padding: 10,
-        border: "none",
-        background: "linear-gradient(135deg,#c9a96e,#bfa14a)",
+    sold: {
+        fontSize: 12,
+        color: "#888",
+        marginTop: 4
+    },
+    hot: {
+        position: "absolute",
+        top: 10,
+        left: 10,
+        background: "#ff3b30",
         color: "#fff",
-        borderRadius: 20,
-        cursor: "pointer"
+        fontSize: 11,
+        padding: "3px 8px",
+        borderRadius: 999
     },
-
-    highlight: {
-        background: "#ffe08a",
-        fontWeight: "bold",
-        padding: "2px 4px",
-        borderRadius: 4
+    pagination: {
+        marginTop: 35,
+        display: "flex",
+        justifyContent: "center",
+        gap: 20
     }
 };

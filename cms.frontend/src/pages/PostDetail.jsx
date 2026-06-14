@@ -43,7 +43,7 @@ export default function PostDetail() {
                     </h1>
 
                     <p style={{ color: "#ddd", marginTop: 10 }}>
-                        Luxury Jewelry • {new Date().toLocaleDateString()}
+                        Luxury Jewelry •{new Date(post.createdDate).toLocaleDateString()}
                     </p>
                 </div>
 

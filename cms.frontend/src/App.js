@@ -10,6 +10,7 @@ import Register from "./pages/Register";
 import Login from "./pages/Login";
 import BlogPage from "./pages/BlogPage";
 import AboutPage from "./pages/AboutPage";
+import OrderSuccess from "./pages/OrderSuccess";
 function App() {
     return (
         <BrowserRouter>
@@ -30,6 +31,8 @@ function App() {
                 <Route path="/blog" element={<BlogPage />} />
 
                 <Route path="/about" element={<AboutPage />} />
+
+                <Route path="/order-success/:id" element={<OrderSuccess />} />
             </Routes>
         </BrowserRouter>
     );

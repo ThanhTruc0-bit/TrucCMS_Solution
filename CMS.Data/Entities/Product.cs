@@ -31,7 +31,7 @@ namespace CMS.Data.Entities
         public decimal Price { get; set; }
 
         public int StockQuantity { get; set; }
-
+        public int SoldQuantity { get; set; } = 0;
         public string? ImageUrl { get; set; }
 
         // Khóa ngoại nối tới CategoryProduct

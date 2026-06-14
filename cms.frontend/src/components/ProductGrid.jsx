@@ -2,23 +2,36 @@
 import { Link, useSearchParams } from "react-router-dom";
 import ProductCard from "./ProductCard";
 
+const BASE = "https://localhost:7194";
+
 export default function ProductGrid() {
     const [products, setProducts] = useState([]);
-
     const [searchParams] = useSearchParams();
+
     const page = parseInt(searchParams.get("page")) || 1;
+    const categoryId = searchParams.get("categoryId");
 
     useEffect(() => {
         fetchProducts();
-    }, [page]);
+    }, [page, categoryId]);
 
     const fetchProducts = async () => {
         try {
-            const res = await fetch(
-                `https://localhost:7194/api/Products/paging?page=${page}&pageSize=8`
-            );
-            const data = await res.json();
-            setProducts(data);
+            let url = `${BASE}/api/Products/paging?page=${page}&pageSize=8`;
+
+            // 👉 nếu có categoryId thì lọc
+            if (categoryId) {
+                url = `${BASE}/api/Products/category/${categoryId}`;
+            }
+
+            const res = await fetch(url);
+            const result = await res.json();
+
+            // paging trả {data}, category trả list
+            const list = result.data || result;
+
+            setProducts(Array.isArray(list) ? list : []);
+
         } catch (error) {
             console.log("Lỗi load sản phẩm:", error);
         }
@@ -31,35 +44,33 @@ export default function ProductGrid() {
                 SẢN PHẨM NỔI BẬT
             </h2>
 
-            {/* GRID */}
             <div style={styles.grid}>
                 {products.map((p) => (
                     <ProductCard key={p.id} {...p} />
                 ))}
             </div>
 
-            {/* PAGINATION */}
-            <div style={styles.paging}>
-                {page > 1 && (
-                    <Link to={`/?page=${page - 1}`}>
-                        <button style={styles.btn}>Prev</button>
+            {/* chỉ show paging khi KHÔNG filter category */}
+            {!categoryId && (
+                <div style={styles.paging}>
+                    {page > 1 && (
+                        <Link to={`/?page=${page - 1}`}>
+                            <button style={styles.btn}>Prev</button>
+                        </Link>
+                    )}
+
+                    <span style={styles.page}>Trang {page}</span>
+
+                    <Link to={`/?page=${page + 1}`}>
+                        <button style={styles.btn}>Next</button>
                     </Link>
-                )}
-
-                <span style={styles.page}>
-                    Trang {page}
-                </span>
-
-                <Link to={`/?page=${page + 1}`}>
-                    <button style={styles.btn}>Next</button>
-                </Link>
-            </div>
+                </div>
+            )}
 
         </div>
     );
 }
 
-/* STYLE */
 const styles = {
     wrapper: {
         marginTop: 80,

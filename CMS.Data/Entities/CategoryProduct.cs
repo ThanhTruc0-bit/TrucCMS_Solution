@@ -24,7 +24,7 @@ namespace CMS.Data.Entities
         [Required(ErrorMessage = "Tên danh mục không được để trống")]
         [StringLength(100)]
         public string Name { get; set; }
-
+        public string? ImageUrl { get; set; }
         public string? Description { get; set; }
 
         // Quan hệ: Một danh mục có nhiều sản phẩm

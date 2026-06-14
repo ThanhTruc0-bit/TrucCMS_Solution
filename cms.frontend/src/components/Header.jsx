@@ -10,8 +10,8 @@ export default function Header() {
 
     const userRef = useRef();
 
+    // ❗ FIX: lấy user trực tiếp (KHÔNG dùng token nữa)
     const user = JSON.parse(localStorage.getItem("user"));
-    const token = localStorage.getItem("token");
 
     // 🛒 CART COUNT
     useEffect(() => {
@@ -32,7 +32,7 @@ export default function Header() {
         navigate(`/shop?keyword=${encodeURIComponent(keyword)}`);
     };
 
-    // 👤 CLOSE OUTSIDE
+    // 👤 CLICK OUTSIDE
     useEffect(() => {
         const handleClickOutside = (e) => {
             if (userRef.current && !userRef.current.contains(e.target)) {
@@ -44,13 +44,16 @@ export default function Header() {
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
-    // 🚪 LOGOUT
+    // 🚪 LOGOUT (XÓA COOKIE + LOCAL)
     const handleLogout = () => {
-        localStorage.removeItem("token");
+        // ❗ Xóa localStorage
         localStorage.removeItem("user");
 
+        // ❗ Xóa cookie nếu có
+        document.cookie = "user=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+
         setOpenUser(false);
-        navigate("/");
+        navigate("/login");
     };
 
     return (
@@ -63,6 +66,7 @@ export default function Header() {
                     Luxury Jewelry
                 </Link>
 
+                {/* SEARCH */}
                 <div style={styles.searchBox}>
                     <input
                         value={keyword}
@@ -93,7 +97,7 @@ export default function Header() {
                         {openUser && (
                             <div style={styles.dropdown}>
 
-                                {!token ? (
+                                {!user ? (
                                     <>
                                         <div style={styles.item} onClick={() => navigate("/login")}>
                                             🔑 Đăng nhập
@@ -106,7 +110,7 @@ export default function Header() {
                                 ) : (
                                     <>
                                         <div style={styles.item}>
-                                            👤 {user?.name || "User"}
+                                            👤 {user.fullName || user.username}
                                         </div>
 
                                         <div style={styles.item} onClick={handleLogout}>
@@ -141,8 +145,9 @@ export default function Header() {
         </div>
     );
 }
-const styles = {
 
+/* STYLE */
+const styles = {
     wrapper: {
         fontFamily: "serif",
         position: "sticky",
@@ -156,8 +161,6 @@ const styles = {
         alignItems: "center",
         justifyContent: "space-between",
         padding: "22px 60px",
-        background: "#ffffffee",
-        backdropFilter: "blur(10px)",
         borderBottom: "1px solid #eee"
     },
 
@@ -219,12 +222,6 @@ const styles = {
         overflow: "hidden"
     },
 
-    dropdownHeader: {
-        padding: "12px 14px",
-        borderBottom: "1px solid #eee",
-        background: "#fafafa"
-    },
-
     item: {
         padding: "12px 14px",
         cursor: "pointer",
@@ -253,7 +250,6 @@ const styles = {
         justifyContent: "center",
         gap: 40,
         padding: "14px 0",
-        background: "#fff",
         borderBottom: "1px solid #eee"
     },
 
