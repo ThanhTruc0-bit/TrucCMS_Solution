@@ -70,7 +70,7 @@ export default function ProductCard({ id, name, price, imageUrl }) {
                         to={`/product/${id}`}
                         className="flex-1 py-2.5 rounded-full border border-gray-300 text-sm font-semibold text-gray-800 hover:border-amber-500 hover:text-amber-600 transition"
                     >
-                        Chi tiết
+                        Details
                     </Link>
 
                     <button
@@ -78,7 +78,7 @@ export default function ProductCard({ id, name, price, imageUrl }) {
                         onClick={handleBuyNow}
                         className="flex-1 py-2.5 rounded-full bg-amber-500 text-sm font-semibold text-white hover:bg-amber-600 transition"
                     >
-                        Mua ngay
+                        Buy Now
                     </button>
                 </div>
             </div>

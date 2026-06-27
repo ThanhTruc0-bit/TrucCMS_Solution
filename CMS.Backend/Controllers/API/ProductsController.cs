@@ -166,10 +166,12 @@ namespace CMS.Backend.Controllers.API
                     CategoryName = p.CategoryProduct != null ? p.CategoryProduct.Name : ""
                 })
                 .ToList();
-
             return Ok(new
             {
                 total,
+                page,
+                pageSize,
+                totalPages = (int)Math.Ceiling((double)total / pageSize),
                 data
             });
         }
@@ -346,6 +348,9 @@ namespace CMS.Backend.Controllers.API
             return Ok(new
             {
                 total,
+                page,
+                pageSize,
+                totalPages = (int)Math.Ceiling((double)total / pageSize),
                 data
             });
         }

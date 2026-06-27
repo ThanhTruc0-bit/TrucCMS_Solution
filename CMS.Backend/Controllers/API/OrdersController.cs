@@ -73,8 +73,9 @@ namespace CMS.Backend.Controllers.API
                         UnitPrice = product.Price
                     });
 
-                    // FIX: thiếu trừ kho
+                    // Cập nhật tồn kho và số lượng đã bán
                     product.StockQuantity -= item.Quantity;
+                    product.SoldQuantity += item.Quantity;
                 }
 
                 _context.SaveChanges();

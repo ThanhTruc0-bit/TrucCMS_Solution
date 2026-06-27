@@ -11,7 +11,7 @@ export default function ProductGrid() {
 
     const page = parseInt(searchParams.get("page")) || 1;
     const categoryId = searchParams.get("categoryId");
-
+    const [totalPages, setTotalPages] = useState(1);
     useEffect(() => {
         fetchProducts();
     }, [page, categoryId]);
@@ -20,7 +20,7 @@ export default function ProductGrid() {
         try {
             setLoading(true);
 
-            let url = `${API_BASE_URL}/api/Products/paging?page=${page}&pageSize=8`;
+            let url = `${API_BASE_URL}/api/Products/paging?page=${page}&pageSize=4`;
 
             if (categoryId) {
                 url = `${API_BASE_URL}/api/Products/category/${categoryId}`;
@@ -36,12 +36,14 @@ export default function ProductGrid() {
                     : [];
 
             setProducts(list);
+            setTotalPages(result.totalPages);
         } catch (error) {
             console.log("Lỗi load sản phẩm:", error);
             setProducts([]);
         } finally {
             setLoading(false);
         }
+
     };
 
     if (loading) {
@@ -62,7 +64,7 @@ export default function ProductGrid() {
                 </p>
 
                 <h2 className="text-3xl md:text-4xl font-bold text-gray-950 mt-3">
-                    All products
+                    All Products
                 </h2>
 
                 <div className="w-20 h-1 bg-amber-500 mx-auto mt-4 rounded-full"></div>
@@ -75,7 +77,7 @@ export default function ProductGrid() {
                     </p>
                 </div>
             ) : (
-                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                     {products.map((p) => (
                         <ProductCard
                             key={p.id || p.Id}
@@ -100,7 +102,7 @@ export default function ProductGrid() {
                     )}
 
                     <span className="px-5 py-2.5 rounded-full bg-white border border-gray-200 text-sm font-semibold text-gray-700">
-                        Trang {page}
+                        Page {page} / {totalPages}
                     </span>
 
                     <Link

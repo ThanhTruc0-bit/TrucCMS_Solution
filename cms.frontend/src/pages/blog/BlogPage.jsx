@@ -76,11 +76,11 @@ export default function BlogPage() {
                         </p>
 
                         <h1 className="text-3xl md:text-4xl font-bold text-gray-950">
-                            Tin tức & Xu hướng
+                            News & Trends
                         </h1>
 
                         <p className="text-sm text-gray-500 mt-2">
-                            Cập nhật những bài viết mới nhất về trang sức và phong cách.
+                            Discover the latest jewelry news, trends and fashion inspiration.
                         </p>
                     </div>
 
@@ -89,7 +89,7 @@ export default function BlogPage() {
                         onClick={() => navigate("/")}
                         className="w-fit px-5 py-2.5 rounded-full bg-white border border-gray-300 text-sm font-semibold text-gray-800 hover:bg-gray-950 hover:text-white transition"
                     >
-                        ← Trang chủ
+                        ← Home
                     </button>
                 </div>
 
@@ -97,11 +97,11 @@ export default function BlogPage() {
                 {posts.length === 0 ? (
                     <div className="bg-white rounded-2xl border border-amber-100 shadow-sm p-8 text-center">
                         <p className="text-sm text-gray-500">
-                            Chưa có bài viết nào.
+                            No articles available.
                         </p>
                     </div>
                 ) : (
-                    <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+                        <div className="grid gap-8 md:grid-cols-2 xl:grid-cols-3 items-stretch">
                         {posts.map((post) => {
                             const id = post.id || post.Id;
                             const title = post.title || post.Title || "";
@@ -118,10 +118,10 @@ export default function BlogPage() {
                             return (
                                 <article
                                     key={id}
-                                    className="group bg-white rounded-2xl overflow-hidden border border-amber-100 shadow-sm hover:shadow-xl transition duration-300"
+                                    className="group flex flex-col h-full bg-white rounded-2xl overflow-hidden border border-amber-100 shadow-sm hover:shadow-xl transition duration-300"
                                 >
                                     <Link to={`/post/${id}`}>
-                                        <div className="h-52 overflow-hidden bg-gray-100">
+                                        <div className="relative h-60 overflow-hidden bg-gray-100">
                                             <img
                                                 src={fixImageUrl(imageUrl) || NO_IMAGE}
                                                 alt={title}
@@ -133,7 +133,7 @@ export default function BlogPage() {
                                         </div>
                                     </Link>
 
-                                    <div className="p-5">
+                                    <div className="p-6 flex flex-col flex-1">
                                         {createdDate && (
                                             <div className="text-xs text-gray-400 mb-2">
                                                 🗓 {new Date(createdDate).toLocaleDateString()}
@@ -141,27 +141,23 @@ export default function BlogPage() {
                                         )}
 
                                         <Link to={`/post/${id}`}>
-                                            <h3 className="text-lg font-bold text-gray-950 hover:text-amber-600 transition mb-3 line-clamp-2 min-h-[56px]">
+                                            <h3 className="text-xl font-bold text-gray-950 hover:text-amber-600 transition mb-3 line-clamp-2 min-h-[60px]">
                                                 {title}
                                             </h3>
                                         </Link>
 
-                                        <p className="text-gray-500 text-sm leading-6 mb-5 line-clamp-3">
+                                        <p className="text-gray-500 text-sm leading-7 line-clamp-3 flex-1">
                                             {shortContent
                                                 ? shortContent.slice(0, 120) + "..."
                                                 : "Không có nội dung"}
                                         </p>
 
-                                        <div className="flex items-center justify-between">
-                                            <span className="text-xs text-gray-400">
-                                                ID: {id}
-                                            </span>
-
+                                        <div className="mt-6">
                                             <Link
                                                 to={`/post/${id}`}
-                                                className="inline-flex px-5 py-2 rounded-full border border-amber-500 text-amber-600 text-sm font-semibold hover:bg-amber-500 hover:text-white transition"
+                                                className="flex items-center justify-center w-full py-3 rounded-full border border-amber-500 text-amber-600 text-sm font-semibold hover:bg-amber-500 hover:text-white transition"
                                             >
-                                                Đọc thêm →
+                                                Read More →
                                             </Link>
                                         </div>
                                     </div>
@@ -183,11 +179,11 @@ export default function BlogPage() {
                                     : "bg-white text-gray-800 hover:bg-amber-500 hover:text-white hover:border-amber-500"
                                 }`}
                         >
-                            ← Trước
+                            ← Previous
                         </button>
 
                         <span className="px-5 py-2.5 rounded-full bg-white border border-gray-200 text-sm font-semibold text-gray-700">
-                            Trang {page}
+                            Page {page}
                         </span>
 
                         <button
@@ -195,7 +191,7 @@ export default function BlogPage() {
                             onClick={() => setPage(page + 1)}
                             className="px-5 py-2.5 rounded-full bg-amber-500 text-white text-sm font-semibold hover:bg-amber-600 transition"
                         >
-                            Sau →
+                            Next →
                         </button>
                     </div>
                 )}

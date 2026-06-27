@@ -47,7 +47,7 @@ export default function Shop() {
 
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(false);
-
+    const [totalPages, setTotalPages] = useState(1);
     useEffect(() => {
         fetchProducts();
     }, [page, categoryId, sort, minPrice, maxPrice, keyword]);
@@ -60,7 +60,7 @@ export default function Shop() {
     };
 
     const fetchProducts = async () => {
-        let url = `${API_BASE_URL}/api/products/shop?page=${page}&pageSize=8`;
+        let url = `${API_BASE_URL}/api/products/shop?page=${page}&pageSize=4`;
 
         if (categoryId) url += `&categoryId=${categoryId}`;
         if (sort) url += `&sort=${sort}`;
@@ -88,6 +88,7 @@ export default function Shop() {
                     : [];
 
             setProducts(list);
+            setTotalPages(data.totalPages || 1);
         } catch (err) {
             console.log("Product error:", err);
             setProducts([]);
@@ -211,16 +212,17 @@ export default function Shop() {
                                         </button>
 
                                         <div className="px-5 py-2 rounded-full bg-white border border-gray-200 text-sm font-medium">
-                                            Page {page}
+                                                Page {page} / {totalPages}
                                         </div>
 
-                                        <button
-                                            type="button"
-                                            onClick={() => changePage(page + 1)}
-                                            className="w-10 h-10 rounded-full bg-white border border-gray-200 text-gray-700 hover:bg-amber-500 hover:text-white transition"
-                                        >
-                                            →
-                                        </button>
+                                            <button
+                                                type="button"
+                                                disabled={page >= totalPages}
+                                                onClick={() => changePage(page + 1)}
+                                                className="w-10 h-10 rounded-full bg-white border border-gray-200 text-gray-700 hover:bg-amber-500 hover:text-white transition disabled:opacity-40 disabled:cursor-not-allowed"
+                                            >
+                                                →
+                                            </button>
                                     </div>
                                 </>
                             ) : (

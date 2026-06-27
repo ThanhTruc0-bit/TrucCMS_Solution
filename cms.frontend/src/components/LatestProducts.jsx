@@ -53,6 +53,12 @@ export default function LatestProducts() {
         const name = p.name || p.Name || "";
         const price = p.price || p.Price || 0;
         const imageUrl = p.imageUrl || p.ImageUrl || "";
+        const stockQuantity = Number(p.stockQuantity ?? p.StockQuantity ?? 0);
+
+        if (stockQuantity <= 0) {
+            alert("Số lượng sản phẩm trong kho không đủ!");
+            return;
+        }
 
         const buyNowItem = {
             id,
@@ -87,7 +93,7 @@ export default function LatestProducts() {
                     </p>
 
                     <h2 className="text-3xl font-bold mt-3 text-gray-950">
-                        Latest product
+                        Latest Products
                     </h2>
 
                     <p className="mt-5 text-sm text-gray-500">
@@ -107,7 +113,7 @@ export default function LatestProducts() {
                 </p>
 
                 <h2 className="text-3xl md:text-4xl font-bold mt-3 text-gray-950">
-                    Latest product
+                    Latest Products
                 </h2>
 
                 <div className="w-20 h-1 bg-amber-500 mx-auto mt-4 rounded-full"></div>
@@ -120,6 +126,7 @@ export default function LatestProducts() {
                     const name = p.name || p.Name || "";
                     const price = p.price || p.Price || 0;
                     const imageUrl = p.imageUrl || p.ImageUrl || "";
+                    const stockQuantity = Number(p.stockQuantity ?? p.StockQuantity ?? 0);
 
                     return (
                         <div
@@ -152,8 +159,12 @@ export default function LatestProducts() {
                                     </h3>
                                 </Link>
 
-                                <p className="text-xl font-bold text-amber-600 mb-5">
+                                <p className="text-xl font-bold text-amber-600 mb-2">
                                     {Number(price).toLocaleString()} đ
+                                </p>
+
+                                <p className="text-xs text-gray-500 mb-5">
+                                    Còn lại {stockQuantity} sản phẩm
                                 </p>
 
                                 <div className="flex gap-3">
@@ -167,7 +178,8 @@ export default function LatestProducts() {
                                     <button
                                         type="button"
                                         onClick={() => handleBuyNow(p)}
-                                        className="flex-1 py-2.5 rounded-full bg-amber-500 text-sm font-semibold text-white hover:bg-amber-600 transition"
+                                        disabled={stockQuantity <= 0}
+                                        className="flex-1 py-2.5 rounded-full bg-amber-500 text-sm font-semibold text-white hover:bg-amber-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
                                         Mua ngay
                                     </button>

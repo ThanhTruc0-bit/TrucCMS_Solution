@@ -69,25 +69,30 @@ export default function ShopSidebar() {
         const timer = setTimeout(() => {
             const params = new URLSearchParams(location.search);
 
-            if (minPrice !== "") {
+            const currentMin = params.get("minPrice") || "";
+            const currentMax = params.get("maxPrice") || "";
+
+            if (currentMin === minPrice && currentMax === maxPrice) {
+                return;
+            }
+
+            if (minPrice)
                 params.set("minPrice", minPrice);
-            } else {
+            else
                 params.delete("minPrice");
-            }
 
-            if (maxPrice !== "") {
+            if (maxPrice)
                 params.set("maxPrice", maxPrice);
-            } else {
+            else
                 params.delete("maxPrice");
-            }
 
-            params.set("page", 1);
+            params.set("page", "1");
 
             navigate(`/shop?${params.toString()}`);
         }, 500);
 
         return () => clearTimeout(timer);
-    }, [minPrice, maxPrice, location.search, navigate]);
+    }, [minPrice, maxPrice]);
 
     const clearFilters = () => {
         setMinPrice("");

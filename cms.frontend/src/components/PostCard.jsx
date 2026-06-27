@@ -17,13 +17,13 @@ const NO_IMAGE =
 
 export default function PostCard({ id, title, imageUrl }) {
     return (
-        <div className="group bg-white rounded-2xl overflow-hidden border border-amber-100 shadow-sm hover:shadow-xl transition duration-300">
+        <div className="group flex flex-col h-full bg-white rounded-2xl overflow-hidden border border-amber-100 shadow-sm hover:shadow-xl transition duration-300">
             {/* IMAGE */}
             <Link to={`/post/${id}`}>
-                <div className="overflow-hidden h-52 bg-gray-100">
+                <div className="relative h-60 overflow-hidden bg-gray-100">
                     <img
                         src={fixImageUrl(imageUrl) || NO_IMAGE}
-                        alt={title || "post"}
+                        alt={title || "Post"}
                         onError={(e) => {
                             e.currentTarget.src = NO_IMAGE;
                         }}
@@ -33,23 +33,25 @@ export default function PostCard({ id, title, imageUrl }) {
             </Link>
 
             {/* CONTENT */}
-            <div className="p-5 text-center">
-                <p className="text-xs uppercase tracking-[4px] text-amber-500 font-semibold mb-2">
-                    Fashion Blog
+            <div className="p-6 flex flex-col flex-1 text-center">
+                <p className="text-xs uppercase tracking-[4px] text-amber-500 font-semibold mb-3">
+                    Jewelry Blog
                 </p>
 
                 <Link to={`/post/${id}`}>
-                    <h3 className="text-base font-bold text-gray-950 leading-6 mb-5 min-h-[48px] line-clamp-2 hover:text-amber-600 transition">
+                    <h3 className="text-lg font-bold text-gray-950 leading-7 mb-6 min-h-[60px] line-clamp-2 hover:text-amber-600 transition">
                         {title}
                     </h3>
                 </Link>
 
-                <Link
-                    to={`/post/${id}`}
-                    className="inline-flex items-center justify-center px-5 py-2.5 rounded-full border border-gray-300 text-sm font-semibold text-gray-800 hover:bg-amber-500 hover:text-white hover:border-amber-500 transition"
-                >
-                    Đọc bài viết
-                </Link>
+                <div className="mt-auto">
+                    <Link
+                        to={`/post/${id}`}
+                        className="flex items-center justify-center w-full py-3 rounded-full border border-amber-500 text-amber-600 text-sm font-semibold hover:bg-amber-500 hover:text-white transition"
+                    >
+                        Read More →
+                    </Link>
+                </div>
             </div>
         </div>
     );
