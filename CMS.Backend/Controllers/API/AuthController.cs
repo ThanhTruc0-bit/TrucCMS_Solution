@@ -25,10 +25,12 @@ namespace CMS.Backend.Controllers.API
 
             if (exists)
                 return BadRequest(new { message = "Username đã tồn tại" });
+
             var emailExists = _context.Customers.Any(c => c.Email == request.Email);
 
             if (emailExists)
                 return BadRequest(new { message = "Email đã tồn tại" });
+
             var user = new User
             {
                 Username = request.Username,
@@ -69,7 +71,6 @@ namespace CMS.Backend.Controllers.API
                 return BadRequest(new { message = "Sai tài khoản hoặc mật khẩu" });
             }
 
-            // 🔥 FIX Ở ĐÂY
             var customer = _context.Customers
                 .FirstOrDefault(c => c.FullName == user.FullName);
 
@@ -80,13 +81,21 @@ namespace CMS.Backend.Controllers.API
 
             return Ok(new
             {
+                message = "Đăng nhập thành công",
+
                 user = new
                 {
-                    user.Id,
-                    user.Username,
-                    user.FullName,
-                    user.Role
+                    id = user.Id,
+                    username = user.Username,
+                    fullName = user.FullName,
+                    role = user.Role,
+
+                    // THÊM 3 DÒNG NÀY ĐỂ CHECKOUT TỰ HIỆN
+                    email = customer.Email,
+                    phone = customer.Phone,
+                    address = customer.Address
                 },
+
                 customerId = customer.Id
             });
         }

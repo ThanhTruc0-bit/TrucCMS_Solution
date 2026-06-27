@@ -1,6 +1,19 @@
 ﻿import { Link, useNavigate } from "react-router-dom";
+import { fixImageUrl } from "../config/appConfig";
 
-const BASE = "https://localhost:7194";
+const NO_IMAGE =
+    "data:image/svg+xml;charset=UTF-8," +
+    encodeURIComponent(`
+        <svg xmlns="http://www.w3.org/2000/svg" width="300" height="260">
+            <rect width="100%" height="100%" fill="#f3f4f6"/>
+            <circle cx="150" cy="105" r="40" fill="#d1d5db"/>
+            <rect x="85" y="170" width="130" height="12" rx="6" fill="#d1d5db"/>
+            <text x="50%" y="215" dominant-baseline="middle" text-anchor="middle"
+                fill="#9ca3af" font-size="16" font-family="Arial">
+                No Image
+            </text>
+        </svg>
+    `);
 
 export default function ProductCard({ id, name, price, imageUrl }) {
     const navigate = useNavigate();
@@ -14,83 +27,61 @@ export default function ProductCard({ id, name, price, imageUrl }) {
             quantity: 1
         };
 
-        // 👉 GHI VÀO CART để Checkout dùng được
         localStorage.setItem("cart", JSON.stringify([buyNowItem]));
+        window.dispatchEvent(new Event("cartUpdated"));
 
         navigate("/checkout");
     };
 
     return (
-        <div style={styles.card}>
-
+        <div className="group bg-white rounded-2xl overflow-hidden border border-amber-100 shadow-sm hover:shadow-xl transition duration-300">
             {/* IMAGE */}
-            <div style={styles.imgWrap}>
-                <img
-                    src={BASE + imageUrl}
-                    alt={name}
-                    style={styles.img}
-                />
-            </div>
+            <Link to={`/product/${id}`}>
+                <div className="relative h-56 overflow-hidden bg-gray-100">
+                    <img
+                        src={fixImageUrl(imageUrl) || NO_IMAGE}
+                        alt={name || "product"}
+                        onError={(e) => {
+                            e.currentTarget.src = NO_IMAGE;
+                        }}
+                        className="w-full h-full object-cover group-hover:scale-110 transition duration-500"
+                    />
 
-            {/* CONTENT */}
-            <div style={styles.body}>
-                <h4 style={styles.name}>{name}</h4>
-
-                <div style={styles.price}>
-                    {price?.toLocaleString()} đ
+                    <span className="absolute top-3 left-3 bg-amber-500 text-white text-[11px] font-semibold px-3 py-1.5 rounded-full shadow">
+                        Jewelry
+                    </span>
                 </div>
+            </Link>
 
-                {/* BUTTON GROUP */}
-                <div style={styles.btnGroup}>
+            {/* BODY */}
+            <div className="p-5 text-center">
+                <Link to={`/product/${id}`}>
+                    <h3 className="text-base font-bold text-gray-950 mb-2 line-clamp-2 min-h-[48px] hover:text-amber-600 transition">
+                        {name}
+                    </h3>
+                </Link>
 
-                    <Link to={`/product/${id}`} style={{ textDecoration: "none" }}>
-                        <button style={styles.detailBtn}>
-                            Xem chi tiết
-                        </button>
+                <p className="text-xl font-bold text-amber-600 mb-5">
+                    {Number(price || 0).toLocaleString()} đ
+                </p>
+
+                <div className="flex gap-3">
+                    <Link
+                        to={`/product/${id}`}
+                        className="flex-1 py-2.5 rounded-full border border-gray-300 text-sm font-semibold text-gray-800 hover:border-amber-500 hover:text-amber-600 transition"
+                    >
+                        Chi tiết
                     </Link>
 
-                    <button onClick={handleBuyNow} style={styles.buyBtn}>
+                    <button
+                        type="button"
+                        onClick={handleBuyNow}
+                        className="flex-1 py-2.5 rounded-full bg-amber-500 text-sm font-semibold text-white hover:bg-amber-600 transition"
+                    >
                         Mua ngay
                     </button>
-
                 </div>
             </div>
         </div>
     );
 }
-
-/* STYLE GIỮ NGUYÊN */
-const styles = {
-    card: {
-        background: "#fff",
-        borderRadius: 14,
-        overflow: "hidden",
-        border: "1px solid #eee",
-        transition: "0.3s",
-        boxShadow: "0 8px 25px rgba(0,0,0,0.06)"
-    },
-    imgWrap: { overflow: "hidden", background: "#fafafa" },
-    img: { width: "100%", height: 260, objectFit: "cover", transition: "0.4s" },
-    body: { padding: 15, textAlign: "center" },
-    name: { fontSize: 15, marginBottom: 8, minHeight: 40, fontWeight: "600" },
-    price: { color: "#c9a96e", fontWeight: "bold", marginBottom: 15 },
-    btnGroup: { display: "flex", gap: 10, justifyContent: "center" },
-    detailBtn: {
-        padding: "8px 14px",
-        borderRadius: 20,
-        border: "1px solid #111",
-        background: "transparent",
-        cursor: "pointer",
-        fontSize: 13
-    },
-    buyBtn: {
-        padding: "8px 14px",
-        borderRadius: 20,
-        border: "none",
-        background: "#c9a96e",
-        color: "#fff",
-        cursor: "pointer",
-        fontSize: 13,
-        fontWeight: "bold"
-    }
-};

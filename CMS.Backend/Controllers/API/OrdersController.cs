@@ -127,5 +127,32 @@ namespace CMS.Backend.Controllers.API
                 })
             });
         }
+        [HttpGet("customer/{customerId}")]
+        public IActionResult GetOrdersByCustomer(int customerId)
+        {
+            var orders = _context.Orders
+                .Include(o => o.OrderDetails)
+                .ThenInclude(d => d.Product)
+                .Where(o => o.CustomerId == customerId)
+                .OrderByDescending(o => o.Id)
+                .Select(o => new
+                {
+                    id = o.Id,
+                    orderDate = o.OrderDate,
+                    status = o.Status,
+                    notes = o.Notes,
+                    totalAmount = o.OrderDetails.Sum(d => d.Quantity * d.UnitPrice),
+                    details = o.OrderDetails.Select(d => new
+                    {
+                        productId = d.ProductId,
+                        productName = d.Product != null ? d.Product.Name : "",
+                        quantity = d.Quantity,
+                        unitPrice = d.UnitPrice
+                    })
+                })
+                .ToList();
+
+            return Ok(orders);
+        }
     }
 }

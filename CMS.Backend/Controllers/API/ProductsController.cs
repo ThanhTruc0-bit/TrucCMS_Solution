@@ -3,8 +3,9 @@ Họ Tên: Nguyễn Thị Thanh Trúc
 MSSV: 2123110119
 Lớp: CCQ2311D
 Ngày tạo: 15/05/2026
-Mô tả: Thực thể danh mục 
- */
+Mô tả: API quản lý và tìm kiếm sản phẩm
+*/
+
 using Microsoft.AspNetCore.Mvc;
 using CMS.Data;
 using CMS.Data.Entities;
@@ -29,6 +30,7 @@ namespace CMS.Backend.Controllers.API
         {
             var products = _context.Products
                 .Include(p => p.CategoryProduct)
+                .Where(x => x.StockQuantity > 0)
                 .Select(p => new
                 {
                     p.Id,
@@ -37,7 +39,7 @@ namespace CMS.Backend.Controllers.API
                     p.ImageUrl,
                     p.StockQuantity,
                     p.CategoryProductId,
-                    CategoryName = p.CategoryProduct.Name
+                    CategoryName = p.CategoryProduct != null ? p.CategoryProduct.Name : ""
                 })
                 .ToList();
 
@@ -49,6 +51,7 @@ namespace CMS.Backend.Controllers.API
         {
             var product = _context.Products
                 .Include(p => p.CategoryProduct)
+                .Where(x => x.StockQuantity > 0)
                 .Where(p => p.Id == id)
                 .Select(p => new
                 {
@@ -59,7 +62,7 @@ namespace CMS.Backend.Controllers.API
                     p.StockQuantity,
                     p.ImageUrl,
                     p.CategoryProductId,
-                    CategoryName = p.CategoryProduct.Name
+                    CategoryName = p.CategoryProduct != null ? p.CategoryProduct.Name : ""
                 })
                 .FirstOrDefault();
 
@@ -74,6 +77,7 @@ namespace CMS.Backend.Controllers.API
         {
             var products = _context.Products
                 .Include(p => p.CategoryProduct)
+                .Where(x => x.StockQuantity > 0)
                 .Where(p => p.CategoryProductId == categoryProductId)
                 .Select(p => new
                 {
@@ -82,7 +86,7 @@ namespace CMS.Backend.Controllers.API
                     p.Price,
                     p.ImageUrl,
                     p.CategoryProductId,
-                    CategoryName = p.CategoryProduct.Name
+                    CategoryName = p.CategoryProduct != null ? p.CategoryProduct.Name : ""
                 })
                 .ToList();
 
@@ -116,10 +120,7 @@ namespace CMS.Backend.Controllers.API
             product.Price = model.Price;
             product.Description = model.Description;
             product.StockQuantity = model.StockQuantity;
-
-            // FIX AN TOÀN: tránh null overwrite
             product.ImageUrl = model.ImageUrl ?? product.ImageUrl;
-
             product.CategoryProductId = model.CategoryProductId;
 
             _context.SaveChanges();
@@ -144,12 +145,26 @@ namespace CMS.Backend.Controllers.API
         [HttpGet("paging")]
         public IActionResult GetPaging(int page = 1, int pageSize = 10)
         {
-            var total = _context.Products.Count();
+            var total = _context.Products
+                .Where(x => x.StockQuantity > 0)
+                .Count();
 
             var data = _context.Products
+                .Include(p => p.CategoryProduct)
+                .Where(x => x.StockQuantity > 0)
                 .OrderByDescending(p => p.Id)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
+                .Select(p => new
+                {
+                    p.Id,
+                    p.Name,
+                    p.Price,
+                    p.ImageUrl,
+                    p.StockQuantity,
+                    p.CategoryProductId,
+                    CategoryName = p.CategoryProduct != null ? p.CategoryProduct.Name : ""
+                })
                 .ToList();
 
             return Ok(new
@@ -158,20 +173,54 @@ namespace CMS.Backend.Controllers.API
                 data
             });
         }
+
         [HttpGet("search")]
-        public IActionResult Search(string keyword)
+        public IActionResult Search(string? keyword)
         {
-            var data = _context.Products
-                .Where(x => x.Name.Contains(keyword ?? ""))
+            var query = _context.Products
+                .Include(x => x.CategoryProduct)
+                .Where(x => x.StockQuantity > 0)
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(keyword))
+            {
+                var key = keyword.Trim();
+                var likeKey = $"%{key}%";
+
+                query = query.Where(x =>
+                    (x.Name != null && EF.Functions.Like(x.Name, likeKey)) ||
+                    (x.Description != null && EF.Functions.Like(x.Description, likeKey)) ||
+                    (x.CategoryProduct != null &&
+                     x.CategoryProduct.Name != null &&
+                     EF.Functions.Like(x.CategoryProduct.Name, likeKey))
+                );
+            }
+
+            var data = query
+                .OrderByDescending(x => x.Id)
+                .Select(p => new
+                {
+                    p.Id,
+                    p.Name,
+                    p.Price,
+                    p.ImageUrl,
+                    p.SoldQuantity,
+                    p.StockQuantity,
+                    p.CategoryProductId,
+                    CategoryName = p.CategoryProduct != null ? p.CategoryProduct.Name : ""
+                })
                 .ToList();
 
             return Ok(data);
         }
+
         [HttpGet("latest")]
         public IActionResult GetLatest()
         {
             var data = _context.Products
-                .OrderByDescending(x => x.Id) 
+                .Include(x => x.CategoryProduct)
+                .Where(x => x.StockQuantity > 0)
+                .OrderByDescending(x => x.Id)
                 .Take(3)
                 .Select(p => new
                 {
@@ -187,11 +236,14 @@ namespace CMS.Backend.Controllers.API
 
             return Ok(data);
         }
+
         [HttpGet("hot")]
         public IActionResult GetHotProducts()
         {
             var data = _context.Products
-                .OrderByDescending(x => x.SoldQuantity) // hoặc OrderCount
+                .Include(x => x.CategoryProduct)
+                .Where(x => x.StockQuantity > 0)
+                .OrderByDescending(x => x.SoldQuantity)
                 .Take(3)
                 .Select(p => new
                 {
@@ -200,40 +252,68 @@ namespace CMS.Backend.Controllers.API
                     p.Price,
                     p.ImageUrl,
                     p.StockQuantity,
-                    CategoryName = p.CategoryProduct.Name
+                    p.SoldQuantity,
+                    CategoryName = p.CategoryProduct != null ? p.CategoryProduct.Name : ""
                 })
                 .ToList();
 
             return Ok(data);
         }
+
         [HttpGet("shop")]
         public IActionResult Shop(
-int page = 1,
-int pageSize = 8,
-int? categoryId = null,
-string? sort = null,
-decimal? minPrice = null,
-decimal? maxPrice = null)
+            int page = 1,
+            int pageSize = 8,
+            int? categoryId = null,
+            string? sort = null,
+            decimal? minPrice = null,
+            decimal? maxPrice = null,
+            string? keyword = null)
         {
+            if (page < 1)
+                page = 1;
+
+            if (pageSize < 1)
+                pageSize = 8;
+
             var query = _context.Products
                 .Include(x => x.CategoryProduct)
+                .Where(x => x.StockQuantity > 0)
                 .AsQueryable();
 
-            // FILTER theo category
-            if (categoryId.HasValue)
+            // ===== SEARCH KEYWORD =====
+            if (!string.IsNullOrWhiteSpace(keyword))
             {
-                query = query.Where(x => x.CategoryProductId == categoryId);
+                var key = keyword.Trim();
+                var likeKey = $"%{key}%";
+
+                query = query.Where(x =>
+                    (x.Name != null && EF.Functions.Like(x.Name, likeKey)) ||
+                    (x.Description != null && EF.Functions.Like(x.Description, likeKey)) ||
+                    (x.CategoryProduct != null &&
+                     x.CategoryProduct.Name != null &&
+                     EF.Functions.Like(x.CategoryProduct.Name, likeKey))
+                );
             }
-            if (minPrice.HasValue)
+
+            // ===== FILTER CATEGORY =====
+            if (categoryId.HasValue && categoryId.Value > 0)
+            {
+                query = query.Where(x => x.CategoryProductId == categoryId.Value);
+            }
+
+            // ===== FILTER PRICE =====
+            if (minPrice.HasValue && minPrice.Value >= 0)
             {
                 query = query.Where(x => x.Price >= minPrice.Value);
             }
 
-            if (maxPrice.HasValue)
+            if (maxPrice.HasValue && maxPrice.Value > 0)
             {
                 query = query.Where(x => x.Price <= maxPrice.Value);
             }
-            // SORT
+
+            // ===== SORT =====
             query = sort switch
             {
                 "price_asc" => query.OrderBy(x => x.Price),
@@ -243,8 +323,10 @@ decimal? maxPrice = null)
                 _ => query.OrderByDescending(x => x.Id)
             };
 
+            // ===== TOTAL =====
             var total = query.Count();
 
+            // ===== PAGING =====
             var data = query
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
@@ -255,8 +337,9 @@ decimal? maxPrice = null)
                     p.Price,
                     p.ImageUrl,
                     p.SoldQuantity,
+                    p.StockQuantity,
                     p.CategoryProductId,
-                    CategoryName = p.CategoryProduct.Name
+                    CategoryName = p.CategoryProduct != null ? p.CategoryProduct.Name : ""
                 })
                 .ToList();
 

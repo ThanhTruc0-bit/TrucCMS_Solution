@@ -1,7 +1,6 @@
 ﻿import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-
-const BASE = "https://localhost:7194";
+import { API_BASE_URL } from "../config/appConfig";
 
 export default function Register() {
     const navigate = useNavigate();
@@ -15,173 +14,221 @@ export default function Register() {
         address: ""
     });
 
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
+
     const handleChange = (e) => {
-        setForm({
-            ...form,
+        setForm((prev) => ({
+            ...prev,
             [e.target.name]: e.target.value
-        });
+        }));
     };
 
     const handleRegister = async () => {
-        if (!form.username || !form.fullName || !form.passwordHash) {
-            alert("Vui lòng nhập đầy đủ thông tin");
+        setError("");
+
+        if (
+            !form.username.trim() ||
+            !form.fullName.trim() ||
+            !form.passwordHash.trim() ||
+            !form.email.trim() ||
+            !form.phone.trim() ||
+            !form.address.trim()
+        ) {
+            setError("Vui lòng nhập đầy đủ thông tin.");
             return;
         }
 
         try {
-            const res = await fetch(`${BASE}/api/auth/register`, {
+            setLoading(true);
+
+            const res = await fetch(`${API_BASE_URL}/api/auth/register`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify(form)
+                body: JSON.stringify({
+                    username: form.username.trim(),
+                    fullName: form.fullName.trim(),
+                    passwordHash: form.passwordHash.trim(),
+                    email: form.email.trim(),
+                    phone: form.phone.trim(),
+                    address: form.address.trim()
+                })
             });
 
             const data = await res.json();
 
-            if (res.ok) {
-                alert("Đăng ký thành công ✨");
-                navigate("/login");
-            } else {
-                alert(data.message || "Đăng ký thất bại");
+            if (!res.ok) {
+                setError(data.message || "Đăng ký thất bại.");
+                return;
             }
 
+            alert("Đăng ký thành công ✨");
+            navigate("/login");
         } catch (err) {
-            console.log(err);
-            alert("Lỗi server");
+            console.log("Register error:", err);
+            setError("Lỗi kết nối máy chủ.");
+        } finally {
+            setLoading(false);
         }
     };
 
     return (
-        <div style={styles.page}>
-            <div style={styles.card}>
-
-                <h1 style={styles.title}>CREATE ACCOUNT</h1>
-                <p style={styles.sub}>Đăng ký tài khoản khách hàng</p>
-
-                <input
-                    name="username"
-                    placeholder="Username"
-                    onChange={handleChange}
-                    style={styles.input}
-                />
-
-                <input
-                    name="fullName"
-                    placeholder="Họ và tên"
-                    onChange={handleChange}
-                    style={styles.input}
-                />
-
-                <input
-                    name="passwordHash"
-                    type="password"
-                    placeholder="Mật khẩu"
-                    onChange={handleChange}
-                    style={styles.input}
-                />
-
-                <input
-                    name="email"
-                    placeholder="Email"
-                    onChange={handleChange}
-                    style={styles.input}
-                />
-
-                <input
-                    name="phone"
-                    placeholder="SĐT"
-                    onChange={handleChange}
-                    style={styles.input}
-                />
-
-                <input
-                    name="address"
-                    placeholder="Địa chỉ"
-                    onChange={handleChange}
-                    style={styles.input}
-                />
-
-                <button onClick={handleRegister} style={styles.button}>
-                    Đăng ký
-                </button>
-
-                <p style={styles.bottomText}>
-                    Đã có tài khoản?{" "}
-                    <Link to="/login" style={styles.link}>
-                        Đăng nhập
+        <main className="min-h-screen bg-gradient-to-br from-gray-950 via-zinc-950 to-black flex items-center justify-center px-4 py-10">
+            <div className="w-full max-w-lg">
+                <div className="mb-8 text-center">
+                    <Link
+                        to="/"
+                        className="text-3xl font-bold text-amber-500"
+                    >
+                        Luxury Jewelry
                     </Link>
-                </p>
 
+                    <p className="mt-3 text-sm text-gray-400">
+                        Create your account to start shopping.
+                    </p>
+                </div>
+
+                <section className="rounded-3xl border border-amber-500/20 bg-white/5 backdrop-blur-xl shadow-2xl overflow-hidden">
+                    <div className="px-7 py-8">
+                        <div className="mb-7 text-center">
+                            <p className="text-xs uppercase tracking-[4px] text-amber-400 mb-2">
+                                New Member
+                            </p>
+
+                            <h1 className="text-3xl font-bold text-white">
+                                Đăng ký
+                            </h1>
+                        </div>
+
+                        <div className="grid md:grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-sm font-semibold text-gray-300 mb-2">
+                                    Username
+                                </label>
+
+                                <input
+                                    name="username"
+                                    placeholder="Nhập username..."
+                                    value={form.username}
+                                    onChange={handleChange}
+                                    className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white placeholder:text-gray-500 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 transition"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-semibold text-gray-300 mb-2">
+                                    Họ và tên
+                                </label>
+
+                                <input
+                                    name="fullName"
+                                    placeholder="Nhập họ tên..."
+                                    value={form.fullName}
+                                    onChange={handleChange}
+                                    className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white placeholder:text-gray-500 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 transition"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-semibold text-gray-300 mb-2">
+                                    Mật khẩu
+                                </label>
+
+                                <input
+                                    name="passwordHash"
+                                    type="password"
+                                    placeholder="Nhập mật khẩu..."
+                                    value={form.passwordHash}
+                                    onChange={handleChange}
+                                    className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white placeholder:text-gray-500 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 transition"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-semibold text-gray-300 mb-2">
+                                    Email
+                                </label>
+
+                                <input
+                                    name="email"
+                                    type="email"
+                                    placeholder="Nhập email..."
+                                    value={form.email}
+                                    onChange={handleChange}
+                                    className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white placeholder:text-gray-500 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 transition"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-semibold text-gray-300 mb-2">
+                                    Số điện thoại
+                                </label>
+
+                                <input
+                                    name="phone"
+                                    placeholder="Nhập số điện thoại..."
+                                    value={form.phone}
+                                    onChange={handleChange}
+                                    className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white placeholder:text-gray-500 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 transition"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-semibold text-gray-300 mb-2">
+                                    Địa chỉ
+                                </label>
+
+                                <input
+                                    name="address"
+                                    placeholder="Nhập địa chỉ..."
+                                    value={form.address}
+                                    onChange={handleChange}
+                                    onKeyDown={(e) => {
+                                        if (e.key === "Enter") handleRegister();
+                                    }}
+                                    className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white placeholder:text-gray-500 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 transition"
+                                />
+                            </div>
+                        </div>
+
+                        {error && (
+                            <div className="mt-5 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm font-medium text-red-300">
+                                {error}
+                            </div>
+                        )}
+
+                        <button
+                            type="button"
+                            onClick={handleRegister}
+                            disabled={loading}
+                            className="mt-6 w-full rounded-full bg-amber-500 py-3 text-sm font-bold text-black hover:bg-amber-400 transition disabled:opacity-60 disabled:cursor-not-allowed"
+                        >
+                            {loading ? "Đang đăng ký..." : "Đăng ký"}
+                        </button>
+
+                        <div className="mt-6 text-center text-sm text-gray-400">
+                            Đã có tài khoản?{" "}
+                            <Link
+                                to="/login"
+                                className="font-semibold text-amber-400 hover:text-amber-300 transition"
+                            >
+                                Đăng nhập
+                            </Link>
+                        </div>
+                    </div>
+
+                    <div className="border-t border-white/10 bg-black/30 px-7 py-4 text-center">
+                        <Link
+                            to="/"
+                            className="text-xs text-gray-500 hover:text-amber-400 transition"
+                        >
+                            ← Quay lại trang chủ
+                        </Link>
+                    </div>
+                </section>
             </div>
-        </div>
+        </main>
     );
 }
-
-const styles = {
-    page: {
-        height: "100vh",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        background: "linear-gradient(135deg, #111, #222)"
-    },
-
-    card: {
-        width: 420,
-        padding: 40,
-        borderRadius: 16,
-        background: "rgba(255,255,255,0.08)",
-        backdropFilter: "blur(15px)",
-        boxShadow: "0 20px 60px rgba(0,0,0,0.5)",
-        color: "#fff",
-        textAlign: "center"
-    },
-
-    title: {
-        marginBottom: 5,
-        letterSpacing: 2,
-        fontSize: 26,
-        color: "#d6b25e"
-    },
-
-    sub: {
-        marginBottom: 25,
-        fontSize: 13,
-        color: "#bbb"
-    },
-
-    input: {
-        width: "100%",
-        padding: 12,
-        marginBottom: 12,
-        borderRadius: 10,
-        border: "1px solid rgba(255,255,255,0.2)",
-        background: "rgba(0,0,0,0.3)",
-        color: "#fff",
-        outline: "none"
-    },
-
-    button: {
-        width: "100%",
-        padding: 12,
-        borderRadius: 10,
-        border: "none",
-        background: "#d6b25e",
-        color: "#111",
-        fontWeight: "bold",
-        cursor: "pointer",
-        marginTop: 10
-    },
-
-    bottomText: {
-        marginTop: 15,
-        fontSize: 13,
-        color: "#ccc"
-    },
-
-    link: {
-        color: "#d6b25e",
-        textDecoration: "none"
-    }
-};
