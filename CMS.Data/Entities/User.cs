@@ -21,6 +21,9 @@ namespace CMS.Data.Entities
         public string PasswordHash { get; set; }
         public string FullName { get; set; }
         public string Role { get; set; } = "User";
+
+        public string? ResetPasswordToken { get; set; }
+        public DateTime? ResetPasswordTokenExpires { get; set; }
     }
 }
 

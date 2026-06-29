@@ -1,65 +1,64 @@
 ﻿import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { API_BASE_URL } from "../config/appConfig";
 
-export default function Login() {
+export default function ResetPassword() {
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
 
-    const [form, setForm] = useState({
-        username: "",
-        passwordHash: ""
-    });
+    const email = searchParams.get("email") || "";
+    const token = searchParams.get("token") || "";
 
-    const [loading, setLoading] = useState(false);
+    const [newPassword, setNewPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
+
     const [error, setError] = useState("");
+    const [loading, setLoading] = useState(false);
 
-    const handleChange = (e) => {
-        setForm((prev) => ({
-            ...prev,
-            [e.target.name]: e.target.value
-        }));
-    };
-
-    const handleLogin = async () => {
+    const handleReset = async () => {
         setError("");
 
-        if (!form.username.trim() || !form.passwordHash.trim()) {
-            setError("Vui lòng nhập đầy đủ tên đăng nhập và mật khẩu.");
+        if (!email || !token) {
+            setError("Link đặt lại mật khẩu không hợp lệ.");
+            return;
+        }
+
+        if (!newPassword.trim() || !confirmPassword.trim()) {
+            setError("Vui lòng nhập đầy đủ mật khẩu.");
+            return;
+        }
+
+        if (newPassword !== confirmPassword) {
+            setError("Mật khẩu xác nhận không khớp.");
             return;
         }
 
         try {
             setLoading(true);
 
-            const res = await fetch(`${API_BASE_URL}/api/auth/login`, {
+            const res = await fetch(`${API_BASE_URL}/api/auth/reset-password`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
-                    username: form.username.trim(),
-                    passwordHash: form.passwordHash.trim()
+                    email,
+                    token,
+                    newPassword
                 })
             });
 
             const data = await res.json();
 
             if (!res.ok) {
-                setError(data.message || "Đăng nhập thất bại.");
+                setError(data.message || "Đặt lại mật khẩu thất bại.");
                 return;
             }
 
-            localStorage.setItem(
-                "user",
-                JSON.stringify({
-                    ...data.user,
-                    customerId: data.customerId
-                })
-            );
-
-            navigate("/");
+            alert("Đặt lại mật khẩu thành công ✨");
+            navigate("/login");
         } catch (err) {
-            console.log("Login error:", err);
+            console.log("Reset password error:", err);
             setError("Lỗi kết nối máy chủ.");
         } finally {
             setLoading(false);
@@ -70,15 +69,12 @@ export default function Login() {
         <main className="min-h-screen bg-gradient-to-br from-gray-950 via-zinc-950 to-black flex items-center justify-center px-4 py-10">
             <div className="w-full max-w-md">
                 <div className="mb-8 text-center">
-                    <Link
-                        to="/"
-                        className="text-3xl font-bold text-amber-500"
-                    >
+                    <Link to="/" className="text-3xl font-bold text-amber-500">
                         Luxury Jewelry
                     </Link>
 
                     <p className="mt-3 text-sm text-gray-400">
-                        Welcome back. Login to continue shopping.
+                        Create a new password for your account.
                     </p>
                 </div>
 
@@ -86,46 +82,41 @@ export default function Login() {
                     <div className="px-7 py-8">
                         <div className="mb-7 text-center">
                             <p className="text-xs uppercase tracking-[4px] text-amber-400 mb-2">
-                                Member Access
+                                Reset Password
                             </p>
 
                             <h1 className="text-3xl font-bold text-white">
-                                Đăng nhập
+                                Đặt lại mật khẩu
                             </h1>
-                           
                         </div>
 
                         <div className="space-y-4">
                             <div>
                                 <label className="block text-sm font-semibold text-gray-300 mb-2">
-                                    Username
+                                    Mật khẩu mới
                                 </label>
 
                                 <input
-                                    name="username"
-                                    placeholder="Nhập username..."
-                                    value={form.username}
-                                    onChange={handleChange}
-                                    onKeyDown={(e) => {
-                                        if (e.key === "Enter") handleLogin();
-                                    }}
+                                    type="password"
+                                    placeholder="Nhập mật khẩu mới..."
+                                    value={newPassword}
+                                    onChange={(e) => setNewPassword(e.target.value)}
                                     className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white placeholder:text-gray-500 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 transition"
                                 />
                             </div>
 
                             <div>
                                 <label className="block text-sm font-semibold text-gray-300 mb-2">
-                                    Password
+                                    Xác nhận mật khẩu
                                 </label>
 
                                 <input
-                                    name="passwordHash"
                                     type="password"
-                                    placeholder="Nhập mật khẩu..."
-                                    value={form.passwordHash}
-                                    onChange={handleChange}
+                                    placeholder="Nhập lại mật khẩu..."
+                                    value={confirmPassword}
+                                    onChange={(e) => setConfirmPassword(e.target.value)}
                                     onKeyDown={(e) => {
-                                        if (e.key === "Enter") handleLogin();
+                                        if (e.key === "Enter") handleReset();
                                     }}
                                     className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white placeholder:text-gray-500 outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 transition"
                                 />
@@ -140,39 +131,22 @@ export default function Login() {
 
                         <button
                             type="button"
-                            onClick={handleLogin}
+                            onClick={handleReset}
                             disabled={loading}
                             className="mt-6 w-full rounded-full bg-amber-500 py-3 text-sm font-bold text-black hover:bg-amber-400 transition disabled:opacity-60 disabled:cursor-not-allowed"
                         >
-                            {loading ? "Đang đăng nhập..." : "Đăng nhập"}
+                            {loading ? "Đang xử lý..." : "Đặt lại mật khẩu"}
                         </button>
 
                         <div className="mt-6 text-center text-sm text-gray-400">
-                            Chưa có tài khoản?{" "}
+                            Quay lại{" "}
                             <Link
-                                to="/register"
+                                to="/login"
                                 className="font-semibold text-amber-400 hover:text-amber-300 transition"
                             >
-                                Đăng ký ngay
+                                Đăng nhập
                             </Link>
                         </div>
-                        <div className="mt-4 text-center">
-                            <Link
-                                to="/forgot-password"
-                                className="text-sm font-semibold text-amber-400 hover:text-amber-300 transition"
-                            >
-                                Quên mật khẩu?
-                            </Link>
-                        </div>
-                    </div>
-
-                    <div className="border-t border-white/10 bg-black/30 px-7 py-4 text-center">
-                        <Link
-                            to="/"
-                            className="text-xs text-gray-500 hover:text-amber-400 transition"
-                        >
-                            ← Quay lại trang chủ
-                        </Link>
                     </div>
                 </section>
             </div>
